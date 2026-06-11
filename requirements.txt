@@ -27,7 +27,7 @@ transformers>=4.50
 accelerate>=0.30
 bitsandbytes>=0.43       # 4-bit NF4 quantization (GPU only)
 sentence-transformers>=2.7   # LaBSE embeddings for near-dup dedup
-fasttext-wheel>=0.9      # language-ID (lid.176)
+fasttext-numpy2-wheel>=0.9   # language-ID (lid.176); NumPy-2 compatible fork of fasttext-wheel
 indic-num2words>=1.3     # optional number normalization
 
 # ---- §4.5 TTS generation (IndicF5) ----
