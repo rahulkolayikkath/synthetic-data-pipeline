@@ -39,7 +39,7 @@ class QCConfig:
     loop_pair_sim: float = 0.95
     loop_band_frac: float = 0.85
     text_repeat_ngram: int = 3
-    device: str = "cpu"                             # "cuda" if available
+    device: str = "cuda"                             # "cpu" or "cuda" if available, Going with cuda as running on gpu 
 
     out_dir: str = "out"
 
