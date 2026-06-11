@@ -40,3 +40,5 @@ safetensors>=0.4
 # ---- §4.6 quality control ----
 speechbrain>=1.0         # ECAPA speaker verification
 jiwer>=3.0               # CER computation (falls back to a builtin if absent)
+# onnxruntime            # optional: silences indic-conformer's onnx-import warnings;
+                         # the ASR model runs fine on its torch path without it.

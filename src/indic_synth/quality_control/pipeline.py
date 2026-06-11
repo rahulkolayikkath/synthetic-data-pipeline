@@ -97,7 +97,8 @@ def run(cfg, logger=None, run_asr=True, run_speaker=True) -> dict:
 
     t0 = time.time()
     stats = {"checked": 0, "passed": 0, "failed": 0}
-    for r in pending:
+    n_pending = len(pending)
+    for i, r in enumerate(pending, 1):
         synth_path = os.path.join(out_dir, r["audio_filepath"])
         ref_path = os.path.join(out_dir, r["ref_audio_path"]) if r.get("ref_audio_path") else None
         result = validate_utterance(
@@ -115,6 +116,13 @@ def run(cfg, logger=None, run_asr=True, run_speaker=True) -> dict:
         append_jsonl(out_manifest, row)
         stats["checked"] += 1
         stats["passed" if result.passed else "failed"] += 1
+
+        if i % qcfg.log_every == 0 or i == n_pending:
+            rate = i / max(time.time() - t0, 1e-9)             # utts/sec
+            eta_min = (n_pending - i) / max(rate, 1e-9) / 60
+            logger.info("[%d/%d] %.1f utt/min, %d pass / %d fail (%.0f%% pass), ETA ~%.0f min",
+                        i, n_pending, rate * 60, stats["passed"], stats["failed"],
+                        100 * stats["passed"] / max(stats["checked"], 1), eta_min)
 
     summary = {
         "stage": "quality_control",

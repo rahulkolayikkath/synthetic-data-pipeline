@@ -39,8 +39,9 @@ class QCConfig:
     loop_pair_sim: float = 0.95
     loop_band_frac: float = 0.85
     text_repeat_ngram: int = 3
-    device: str = "cuda"                             # "cpu" or "cuda" if available, Going with cuda as running on gpu 
+    device: str = "cuda"                             # "cpu" or "cuda" if available, Going with cuda as running on gpu
 
+    log_every: int = 25                              # heartbeat: log progress every N utterances
     out_dir: str = "out"
 
     @classmethod
