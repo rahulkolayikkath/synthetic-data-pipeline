@@ -6,8 +6,10 @@ speakers and reference clips from ai4bharat/Kathbath WITHOUT downloading the
 reference text to condition the zero-shot TTS), not as train/eval data.
 
 Modules:
-    data     — catalog / selection / reference manifest schemas
-    models   — gated-parquet column-projection + selective row-group reader
-    pipeline — Stage A (metadata catalog → seeded stratified sampler) then,
-               across the cost boundary, Stage B (pull only chosen row groups)
+    config   — stage config dataclass (AcquireConfig.from_dict)
+    hf_io    — gated-parquet column-projection + selective row-group reader
+    catalog  — Stage A metadata catalog (audio column never fetched)
+    sampler  — seeded, gender-balanced stratified speaker/clip selection
+    puller   — Stage B selective audio pull (row group read once each)
+    pipeline — run(cfg, logger): catalog -> sample -> (cost boundary) -> pull
 """

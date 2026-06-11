@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Pipeline outputs (manifests + audio live on Drive / locally, not in git)
+out/
+/content/
+
+# Downloaded model artifacts
+lid.176.bin
+*.bin
+pretrained_models/
+
+# OS
+.DS_Store

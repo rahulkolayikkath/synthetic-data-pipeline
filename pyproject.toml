@@ -1,5 +1,23 @@
 # pyproject.toml — makes the project pip-installable so `import indic_synth` resolves.
-# Installed in Colab Cell 2:  !pip install -e .
-# Package lives under src/indic_synth (src layout).
-# TODO: fill in [build-system], [project] (name, version, deps), and the
-#       setuptools src-layout package discovery (package-dir = {"" = "src"}).
+# Installed in Colab Cell 2:  !pip install -e .   (src layout: package lives in src/indic_synth)
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indic-synth"
+version = "0.1.0"
+description = "Synthetic speech data generation pipeline for Indic ASR (Kathbath voices x IndicF5)."
+readme = "README.md"
+requires-python = ">=3.10"
+# Runtime deps are pinned in requirements.txt (kept there so the Colab flow installs
+# heavy/GPU + git-source packages like IndicF5 explicitly). Only pyyaml is needed for
+# the package itself to load a config.
+dependencies = ["pyyaml>=6.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

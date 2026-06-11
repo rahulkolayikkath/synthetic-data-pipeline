@@ -8,7 +8,8 @@ Implements three independent gates per synthetic utterance:
        duration-to-char ratio outside [0.04, 0.30] s/char
 
 Modules:
-    data     — per-utterance QC result schema + reject thresholds
+    config   — stage config dataclass (thresholds + heuristic knobs)
+    checks   — model-free gates + CER + CheckResult/UtteranceQC containers
     models   — indic-conformer-600m ASR + ECAPA speaker-verification wrappers
-    pipeline — run the three gates and produce the validated, packaged dataset
+    pipeline — run(cfg, logger): validate_utterance over the TTS manifest
 """

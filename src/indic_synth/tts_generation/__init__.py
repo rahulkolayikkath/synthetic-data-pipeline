@@ -7,7 +7,7 @@ ONLY with sentences in that speaker's own language (no cross-lingual conditionin
 in the main run).
 
 Modules:
-    data     — synthesis job + output utterance schema
+    config   — stage config dataclass (+ lang_map: sentence code <-> ref lang name)
     models   — IndicF5 wrapper (target text + reference audio path + ref text)
-    pipeline — pair speaker<->sentence, chunk long inputs, synth, write 24 kHz
+    pipeline — run(cfg, logger): pair (same-language) -> chunk -> synth -> 24 kHz
 """

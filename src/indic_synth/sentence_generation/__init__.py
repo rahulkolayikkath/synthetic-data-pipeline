@@ -6,7 +6,9 @@ cell until each hits its valid quota, so topic/type/language balance is
 guaranteed rather than hoped for.
 
 Modules:
-    data     — grid cells, sentence records, rejection-reason log
-    models   — google/gemma-3-12b-it (4-bit) LLM wrapper
-    pipeline — grid loop + programmatic validation gate + checkpointed pool
+    config     — stage config dataclass (grid, quotas, thresholds)
+    prompting  — build_prompt / parse_output + SENTENCE_TYPE_GUIDE
+    validation — the gate: script / langid / degeneracy / numbers / dedup
+    models     — google/gemma-3-12b-it (4-bit) LLM wrapper (load_generator)
+    pipeline   — run(cfg, logger): grid loop + checkpointed pool (generate_pool)
 """

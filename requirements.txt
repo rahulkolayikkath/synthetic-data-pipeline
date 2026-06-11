@@ -1,4 +1,42 @@
-# requirements.txt — runtime dependencies for indic_synth (pinned for reproducibility).
-# Installed in Colab Cell 2:  !pip install -r requirements.txt
-# TODO: pin versions (torch, transformers, datasets, huggingface_hub, soxr,
-#       soundfile, pyloudnorm, speechbrain, jiwer/CER, pyyaml, ...).
+# requirements.txt — runtime dependencies for indic_synth.
+# Installed in Colab Cell 2:  !pip install -r requirements.txt ; !pip install -e .
+
+# ---- core / common (§4.1) ----
+pyyaml>=6.0
+numpy>=1.24
+pandas>=2.0
+
+# ---- §4.2 data acquisition ----
+pyarrow>=14
+fsspec>=2024.2
+huggingface_hub>=0.23
+datasets>=2.18
+
+# ---- §4.3 reference-audio engineering ----
+soundfile>=0.12
+soxr>=0.3                 # high-quality resampling (primary backend)
+librosa>=0.10            # decode mp3/m4a + resample fallback (needs system ffmpeg)
+# pyloudnorm>=0.1        # optional: only for audio_engineering.norm == "lufs"
+
+# ---- §4.4 sentence generation (Gemma-3-12b-it 4-bit) ----
+# NOTE (integration risk): Gemma-3 needs transformers>=4.50, but the IndicF5 (§4.5)
+# notecard pins transformers==4.49.0. They conflict in one env. Default below targets
+# Gemma-3; if IndicF5 fails to load, run §4.4 in a separate session from §4.5/§4.6
+# (the manifests make that safe) or test a single version that loads all three.
+transformers>=4.50
+accelerate>=0.30
+bitsandbytes>=0.43       # 4-bit NF4 quantization (GPU only)
+sentence-transformers>=2.7   # LaBSE embeddings for near-dup dedup
+fasttext-wheel>=0.9      # language-ID (lid.176)
+indic-num2words>=1.3     # optional number normalization
+
+# ---- §4.5 TTS generation (IndicF5) ----
+# IndicF5 is installed from source (not on PyPI):
+#   pip install git+https://github.com/ai4bharat/IndicF5.git
+torch>=2.1
+torchaudio>=2.1
+safetensors>=0.4
+
+# ---- §4.6 quality control ----
+speechbrain>=1.0         # ECAPA speaker verification
+jiwer>=3.0               # CER computation (falls back to a builtin if absent)
