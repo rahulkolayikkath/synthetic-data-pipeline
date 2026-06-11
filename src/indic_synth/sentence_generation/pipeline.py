@@ -53,8 +53,10 @@ def generate_pool(cfg: SentenceConfig, generate, deduper, langid, logger=None) -
 
     cells = [(lc, t, st) for lc in cfg.languages for t in cfg.topics for st in cfg.sentence_types]
     t0 = time.time()
+    logger.info("Grid: %d cells x quota %d (~%d target sentences); already have %d.",
+                len(cells), cfg.per_cell_quota, len(cells) * cfg.per_cell_quota, len(pool))
 
-    for lang_code, topic, stype in cells:
+    for ci, (lang_code, topic, stype) in enumerate(cells, 1):
         name, script = cfg.languages[lang_code][0], cfg.languages[lang_code][1]
         cid = _cell_id(lang_code, topic, stype)
         attempts = 0
@@ -90,6 +92,9 @@ def generate_pool(cfg: SentenceConfig, generate, deduper, langid, logger=None) -
                     rejection_stats[reason] += 1
             save_state()
 
+        logger.info("[%d/%d] %s -> %d/%d valid (%d attempts, %d total, %.0fs elapsed)",
+                    ci, len(cells), cid, cell_counts[cid], cfg.per_cell_quota,
+                    attempts, len(pool), time.time() - t0)
         if cell_counts[cid] < cfg.per_cell_quota:
             logger.warning("cell under quota: %s -> %d/%d", cid, cell_counts[cid], cfg.per_cell_quota)
 
