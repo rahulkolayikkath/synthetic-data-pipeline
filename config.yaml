@@ -1,0 +1,8 @@
+# config.yaml — single source of run configuration for the pipeline.
+# Consumed by scripts/run.py via common.config; pins seeds and per-stage params.
+# TODO: define sections for seed/determinism, output dirs, and each stage:
+#       data_acquisition (languages, speakers=20, gender balance, ref duration window),
+#       audio_engineering (target_sr=24000, normalization),
+#       sentence_generation (grid: languages x topics x sentence_types, quotas, model),
+#       tts_generation (model, batching/precision, output format),
+#       quality_control (thresholds: CER<=0.15, speaker_sim>=0.60, dur/char [0.04,0.30]).

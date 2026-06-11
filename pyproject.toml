@@ -1,0 +1,5 @@
+# pyproject.toml — makes the project pip-installable so `import indic_synth` resolves.
+# Installed in Colab Cell 2:  !pip install -e .
+# Package lives under src/indic_synth (src layout).
+# TODO: fill in [build-system], [project] (name, version, deps), and the
+#       setuptools src-layout package discovery (package-dir = {"" = "src"}).

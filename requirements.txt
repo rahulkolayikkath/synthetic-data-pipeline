@@ -1,0 +1,4 @@
+# requirements.txt — runtime dependencies for indic_synth (pinned for reproducibility).
+# Installed in Colab Cell 2:  !pip install -r requirements.txt
+# TODO: pin versions (torch, transformers, datasets, huggingface_hub, soxr,
+#       soundfile, pyloudnorm, speechbrain, jiwer/CER, pyyaml, ...).
