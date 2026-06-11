@@ -43,7 +43,8 @@ sentence_generation:
     hi: [Hindi, Devanagari]
     #ml: [Malayalam, Malayalam]
   topics:
-    - Daily Commute
+    - Sports
+    # - Daily Commute
     # - Local Cuisine
     # - Tech Troubleshooting
     # - Weather Reports
