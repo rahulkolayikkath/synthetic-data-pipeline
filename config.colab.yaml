@@ -41,19 +41,19 @@ sentence_generation:
   load_in_4bit: true
   languages:                       # code -> [display name, script in SCRIPT_RANGES]
     hi: [Hindi, Devanagari]
-    ml: [Malayalam, Malayalam]
+    #ml: [Malayalam, Malayalam]
   topics:
     - Daily Commute
-    - Local Cuisine
-    - Tech Troubleshooting
-    - Weather Reports
-    - Health and Wellness
-    - Shopping and Markets
-    - Festivals and Culture
-    - Travel and Tourism
-    - Education and School
-    - Banking and Money
-  sentence_types: [declarative, interrogative, imperative, exclamatory]
+    # - Local Cuisine
+    # - Tech Troubleshooting
+    # - Weather Reports
+    # - Health and Wellness
+    # - Shopping and Markets
+    # - Festivals and Culture
+    # - Travel and Tourism
+    # - Education and School
+    # - Banking and Money
+  sentence_types: [declarative] #[declarative, interrogative, imperative, exclamatory]
   per_cell_quota: 13               # 2 langs x 10 topics x 4 types x 13 ~= 1040 sentences
   sentences_per_call: 12
   max_attempts_per_cell: 8
