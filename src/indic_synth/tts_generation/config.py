@@ -20,6 +20,7 @@ class TTSConfig:
     device: str = "cuda"
     out_dir: str = "out"
     seed: int = 1234
+    log_every: int = 25                  # heartbeat: log progress every N utterances
     # sentence language code -> reference-manifest language name
     lang_map: Dict[str, str] = field(default_factory=lambda: {
         "hi": "hindi", "ml": "malayalam",

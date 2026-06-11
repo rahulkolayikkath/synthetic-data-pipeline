@@ -95,7 +95,8 @@ def synthesize_pool(cfg: TTSConfig, synth, logger=None) -> dict:
 
     t0 = time.time()
     stats = {"synthesized": 0, "failed": 0}
-    for s, ref in pending:
+    n_pending = len(pending)
+    for i, (s, ref) in enumerate(pending, 1):
         utt_id = s["id"]
         dst = os.path.join(audio_dir, utt_id + ".wav")
         ref_audio = os.path.join(out_dir, ref["prepared_audio_path"])
@@ -126,6 +127,12 @@ def synthesize_pool(cfg: TTSConfig, synth, logger=None) -> dict:
             "status": "synthesized",
         })
         stats["synthesized"] += 1
+
+        if i % cfg.log_every == 0 or i == n_pending:
+            rate = i / max(time.time() - t0, 1e-9)             # attempts/sec
+            eta_min = (n_pending - i) / max(rate, 1e-9) / 60
+            logger.info("[%d/%d] %.1f utt/min, %d ok / %d fail, ETA ~%.0f min",
+                        i, n_pending, rate * 60, stats["synthesized"], stats["failed"], eta_min)
 
     elapsed = time.time() - t0
     summary = {
