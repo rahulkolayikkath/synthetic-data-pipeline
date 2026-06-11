@@ -1,8 +1,8 @@
 """run — CLI entrypoint for the synthetic speech data pipeline.
 
-Usage (the Colab Cell 3):
-    python scripts/run.py --config config.yaml
-    python scripts/run.py --config config.yaml --stages tts_generation quality_control
+Usage :
+    Run all stages in order: python scripts/run.py --config config.yaml 
+    Run selected stages: python scripts/run.py --config config.yaml --stages tts_generation quality_control
 
 Loads one config.yaml, pins determinism, then runs each stage's run(cfg, logger) in
 order, threading manifests between them via the shared out_dir:
@@ -24,7 +24,6 @@ import os
 import sys
 import time
 
-# Make `import indic_synth` work before `pip install -e .`
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
@@ -65,7 +64,7 @@ def main(argv=None):
     summaries = {}
     for name, fn in STAGES:
         if args.stages and name not in args.stages:
-            continue
+            continue # skip the stages not mentioned in the Config by user
         logger.info("=========== stage: %s ===========", name)
         summaries[name] = fn(cfg, logger)
 

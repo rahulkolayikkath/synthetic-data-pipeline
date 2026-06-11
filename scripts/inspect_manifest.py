@@ -1,13 +1,10 @@
-"""inspect_manifest.py — quick summary of any pipeline manifest (Colab inspect cells).
-
+"""
+inspect_manifest.py — quick summary of any pipeline manifest.
+Inspect on colab cells as such:
     python scripts/inspect_manifest.py <manifest.jsonl> [--n 5]
-
-(Named inspect_manifest, not inspect, so it never shadows Python's stdlib `inspect`
-when scripts/ lands on sys.path.)
-
-Prints the row count, value counts for categorical fields (status, language,
-gender, qc_passed, ...), min/mean/max for numeric fields (duration, cer,
-speaker_sim, ...), and a few sample rows. Stdlib only — no pandas needed.
+Prints the row count, 
+value counts for categorical fields (status, language, gender, qc_passed, ...), 
+min/mean/max for numeric fields (duration, cer,speaker_sim, ...), and a few sample rows. Stdlib only — no pandas needed.
 """
 from __future__ import annotations
 
