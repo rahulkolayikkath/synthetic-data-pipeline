@@ -1,7 +1,7 @@
 # config.colab.yaml — config for the real T4 run on Colab.
-# Identical to config.yaml except out_dir points at Google Drive, so manifests +
-# audio survive runtime disconnects between per-stage sessions.
-#   python scripts/run.py --config config.colab.yaml --stages <stage>
+# Identical to config.yaml except out_dir points at Google Drive, so manifests + audio survive runtime disconnects between per-stage sessions.
+# Each stage reads its own subsection (cfg.stage("<name>")); 
+# the global seed and out_dir below are injected into every subsection as defaults.
 
 # ---- global ----
 seed: 1234

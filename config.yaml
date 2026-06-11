@@ -1,7 +1,7 @@
 # config.yaml — single source of run configuration for the pipeline.
 # Loaded by scripts/run.py via indic_synth.common.config.load_config.
-# Each stage reads its own subsection (cfg.stage("<name>")); the global seed and
-# out_dir below are injected into every subsection as defaults.
+# Each stage reads its own subsection (cfg.stage("<name>")); 
+# the global seed and out_dir below are injected into every subsection as defaults.
 
 # ---- global ----
 seed: 1234
@@ -13,7 +13,7 @@ data_acquisition:
   source: hf                       # "hf" (gated, needs HF_TOKEN) or "local" (fake_kathbath)
   repo_id: ai4bharat/Kathbath
   local_dir: fake_kathbath
-  languages: [hindi, malayalam]    # Kathbath folder names
+  languages: [hindi, malayalam]    # Kathbath folder names (verify against the real HF layout)
   split: valid                     # ~30x smaller than train; plenty for a voice bank
   speakers_per_language: 10
   clips_per_speaker: 4
@@ -75,6 +75,9 @@ tts_generation:
   target_sr: 24000
   max_chars: 300                   # chunk longer text at sentence boundaries
   device: cuda
+  lang_map:                        # sentence code -> reference-manifest language name
+    hi: hindi
+    ml: malayalam
 
 # ---- §4.6 quality control (3 gates) ----
 quality_control:
