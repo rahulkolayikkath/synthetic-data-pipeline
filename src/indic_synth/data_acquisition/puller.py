@@ -1,9 +1,8 @@
-"""data_acquisition.puller — Stage B selective audio pull (§4.2).
+"""data_acquisition.puller — Stage B selective audio pull.
 
 Groups selected rows by file then row group, reads each needed row group exactly
 once (audio column only), and writes ref_audio/<ref_id>.<ext> + appends
-reference_manifest.jsonl. Resumable/idempotent and partial-failure isolated.
-Ported from the tested module; imports rewired to package hf_io + common.logging.
+reference_manifest.jsonl.
 """
 from __future__ import annotations
 
@@ -42,7 +41,7 @@ def _sniff_ext(b: bytes, path: str) -> str:
 
 
 def _load_done(out_manifest: str, out_dir: str) -> set:
-    """ref_ids already downloaded AND still present on disk (idempotent restart)."""
+    """ref_ids already downloaded AND still present on disk."""
     done = set()
     if not os.path.exists(out_manifest):
         return done

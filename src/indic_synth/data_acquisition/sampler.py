@@ -1,9 +1,8 @@
-"""data_acquisition.sampler — seeded stratified speaker/clip selection (§4.2).
+"""data_acquisition.sampler — seeded stratified speaker/clip selection.
 
 Groups by (lang, speaker_id), picks a gender-balanced speaker quota per language
 from the whole pool, and selects clips within the reference-duration window —
 fully determined by catalog order + cfg.seed. Writes selection_manifest.jsonl.
-Ported verbatim from the tested module (no internal imports to rewire).
 """
 from __future__ import annotations
 

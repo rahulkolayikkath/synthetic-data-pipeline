@@ -1,7 +1,7 @@
-"""data_acquisition.config — stage config dataclass (§4.2).
+"""data_acquisition.config — stage config dataclass
 
 The tested acquisition code (catalog/sampler/puller) expects a `cfg` object with
-these attributes. We keep that dataclass intact (light-touch migration) and add
+these attributes. We keep that dataclass intact and add
 `from_dict`, so the orchestrator can build it from the unified config subsection
 (`cfg.stage("data_acquisition")`) without changing any stage logic.
 """
@@ -15,11 +15,9 @@ from typing import List, Optional
 
 @dataclass
 class AcquireConfig:
-    # Source: "hf" reads from huggingface.co (gated -> needs token); "local"
-    # reads a directory laid out like <local_dir>/<lang>/<split>-*.parquet.
-    source: str = "hf"
+    source: str = "hf" # Source: "hf" reads from huggingface.co; "local"
     repo_id: str = "ai4bharat/Kathbath"
-    local_dir: str = "fake_kathbath"
+    local_dir: str = "fake_kathbath" # reads a directory laid out like <local_dir>/<lang>/<split>-*.parquet.
 
     languages: List[str] = field(default_factory=lambda: ["hindi", "tamil"])
     split: str = "valid"

@@ -1,8 +1,7 @@
-"""data_acquisition.hf_io — cheap gated-parquet access (§4.2).
+"""data_acquisition.hf_io — cheap gated-parquet access
 
 Column-projection + row-group reading so Stage A never fetches the audio column
-and Stage B reads only the row groups holding the chosen rows. Ported verbatim
-from the tested kathbath-extraction module (no internal imports to rewire).
+and Stage B reads only the row groups holding the chosen rows.
 """
 from __future__ import annotations
 
@@ -13,9 +12,7 @@ import pyarrow.parquet as pq
 
 # Kathbath per-language schema:
 #   fname, text, audio_filepath (audio), lang, duration, gender, speaker_id
-# We catalog everything EXCEPT the audio column. That single omission is what
-# keeps Stage A cheap: parquet stores each column separately, so projecting
-# these never fetches the multi-hundred-MB audio chunks.
+# We catalog everything EXCEPT the audio column. 
 META_COLS = ["fname", "text", "lang", "duration", "gender", "speaker_id"]
 AUDIO_COL = "audio_filepath"
 

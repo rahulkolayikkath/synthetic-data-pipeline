@@ -1,8 +1,7 @@
-"""data_acquisition.catalog — Stage A metadata catalog (§4.2).
+"""data_acquisition.catalog — Stage A metadata catalog.
 
 Reads only metadata columns (audio skipped) into out_dir/catalog.parquet, sorted
-into a stable order so the seeded sampler is fully reproducible. Ported from the
-tested module; only the imports are rewired to the package's hf_io + common.logging.
+into a stable order so the seeded sampler is fully reproducible. 
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""data_acquisition.pipeline — Stage 4.2 entrypoint.
+"""data_acquisition.pipeline 
 
 `run(cfg, logger)` is the stage's uniform entry called by scripts/run.py. It
 builds the stage config from the unified config subsection, then runs the two
@@ -6,10 +6,9 @@ stages across the cost boundary:
 
     Stage A : build_catalog  -> catalog.parquet
               build_selection -> selection_manifest.jsonl   (seeded, deterministic)
-    --- cost boundary ---
     Stage B : pull_audio     -> ref_audio/*.<ext> + reference_manifest.jsonl
 
-reference_manifest.jsonl is the input to Stage 4.3 (audio_engineering). Returns a
+reference_manifest.jsonl is the input to Stage (audio_engineering). Returns a
 run_summary dict (selection counts, gender balance, row groups / bytes touched).
 """
 from __future__ import annotations

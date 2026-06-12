@@ -1,9 +1,11 @@
-"""data_acquisition — §4.2 Kathbath two-stage speaker acquisition.
+"""data_acquisition — Kathbath two-stage speaker acquisition.
 
-Stage 1 of the pipeline: pull a small, diverse, gender-balanced bank of real
-speakers and reference clips from ai4bharat/Kathbath WITHOUT downloading the
-~170 GB dataset. Kathbath is used purely as a voice bank (reference audio +
-reference text to condition the zero-shot TTS), not as train/eval data.
+Approach:Catalog first and pull selectively 
+
+Stage 1: Build a metadata catalog
+
+Stage 2: Selective Pull
+
 
 Modules:
     config   — stage config dataclass (AcquireConfig.from_dict)
