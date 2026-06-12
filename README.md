@@ -73,6 +73,31 @@ python scripts/smoke_qc.py         # §4.6 DSP/CER gates + orchestration
 python scripts/smoke_e2e.py        # full §4.2 -> §4.6 chain through one out_dir
 ```
 
+## Three ways to test (each catches different things)
+
+| Layer | Command | Runs | Catches |
+|---|---|---|---|
+| **CPU smoke tests** | `python scripts/smoke_*.py` | seconds, no GPU, no downloads | schema / resume / DSP-gate / pairing **logic** regressions |
+| **Quick config** | `--config config.quick.yaml` | minutes on a T4 (real models) | real-model **integration**: downloads, GPU inference, real audio |
+| **Full run** | `--config config.colab.yaml` | hours on a T4 | the actual ~1000-utterance dataset |
+
+The **quick config** is a real GPU run of the whole pipeline at tiny scale — both
+languages, 4 speakers (gender-balanced), ~12 utterances — to verify the chain end to
+end fast. It writes to a **separate** `out_quick/` directory so it never touches the
+real run's checkpoints:
+
+```bash
+python scripts/run.py --config config.quick.yaml --stages data_acquisition
+python scripts/run.py --config config.quick.yaml --stages audio_engineering
+python scripts/run.py --config config.quick.yaml --stages sentence_generation
+python scripts/run.py --config config.quick.yaml --stages tts_generation
+python scripts/run.py --config config.quick.yaml --stages quality_control
+```
+
+These layers are complementary, not interchangeable: the smoke tests prove the
+plumbing without a GPU; the quick config proves the models integrate; the full run
+produces the deliverable.
+
 ## Known integration risk
 
 IndicF5's model card pins `transformers==4.49.0`, while Gemma-3 (§4.4) needs

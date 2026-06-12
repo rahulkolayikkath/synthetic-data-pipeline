@@ -1,0 +1,94 @@
+# config.quick.yaml — fast end-to-end smoke of the REAL pipeline on a T4.
+#
+# Same models, same code, same QC thresholds as config.colab.yaml — only the
+# COUNTS and the OUTPUT DIR differ. Once the models are cached (from a prior run),
+# a full §4.2 -> §4.6 pass finishes in minutes instead of hours, so you can verify
+# the whole chain (multi-language pairing, gender balance, manifest schema, resume)
+# without burning a long run.
+#
+# IMPORTANT: out_dir is a SEPARATE directory (out_quick) so this never collides
+# with the real run's checkpoints. The global out_dir below is injected into every
+# stage subsection, and each stage's resume logic keys off the manifests in that dir.
+#
+#   python scripts/run.py --config config.quick.yaml --stages <stage>
+
+# ---- global ----
+seed: 1234
+out_dir: /content/drive/MyDrive/indic_synth/out_quick   # separate from the real run's .../out
+
+# ---- §4.2 data acquisition (Kathbath voice bank) ----
+# 2 langs x 2 speakers = 4 distinct speakers, gender-balanced (1M + 1F per language).
+data_acquisition:
+  source: hf                       # gated; needs HF_TOKEN + accepted Kathbath terms
+  repo_id: ai4bharat/Kathbath
+  local_dir: fake_kathbath
+  languages: [hindi, malayalam]
+  split: valid
+  speakers_per_language: 2         # 1M + 1F per language
+  clips_per_speaker: 2
+  min_total_speakers: 4
+  gender_balance: true
+  ref_min_dur: 3.0
+  ref_max_dur: 15.0
+  max_retries: 4
+  retry_backoff: 2.0
+  force_catalog: false
+
+# ---- §4.3 reference-audio engineering ----
+audio_engineering:
+  target_sr: 24000                 # matches IndicF5 / F5-TTS front-end
+  norm: peak                       # peak | rms | lufs
+  peak_dbfs: -1.0
+  rms_dbfs: -20.0
+  trim: false
+  max_ref_sec: 15.0
+  subtype: PCM_16
+
+# ---- §4.4 synthetic sentence generation (Gemma-3-12b-it 4-bit) ----
+sentence_generation:
+  model_id: google/gemma-3-12b-it
+  load_in_4bit: true
+  languages:                       # code -> [display name, script in SCRIPT_RANGES]
+    hi: [Hindi, Devanagari]
+    ml: [Malayalam, Malayalam]
+  topics:
+    - Daily Commute
+  sentence_types: [declarative, interrogative]
+  per_cell_quota: 3                # 2 langs x 1 topic x 2 types x 3 = 12 sentences
+  sentences_per_call: 12
+  max_attempts_per_cell: 4
+  temperature: 0.9
+  top_p: 0.95
+  max_new_tokens: 256              # smaller cap than the full run -> faster calls
+  min_words: 3
+  max_words: 20
+  script_min_ratio: 0.90
+  min_type_token_ratio: 0.55
+  near_dup_threshold: 0.92
+  langid_backend: fasttext
+  langid_min_conf: 0.50
+  embed_model_id: sentence-transformers/LaBSE
+
+# ---- §4.5 TTS generation (IndicF5 voice cloning) ----
+tts_generation:
+  model_id: ai4bharat/IndicF5
+  target_sr: 24000
+  max_chars: 300                   # chunk longer text at sentence boundaries
+  device: cuda
+  log_every: 5                     # tiny run -> log progress more often
+  lang_map:                        # sentence code -> reference-manifest language name
+    hi: hindi
+    ml: malayalam
+
+# ---- §4.6 quality control (3 gates) ----
+quality_control:
+  asr_model_id: ai4bharat/indic-conformer-600m-multilingual
+  asr_sr: 16000
+  asr_decoding: ctc
+  spk_model_id: speechbrain/spkrec-ecapa-voxceleb
+  device: cuda
+  log_every: 5                     # tiny run -> log progress more often
+  cer_max: 0.15
+  spk_cos_min: 0.60
+  dur_per_char_min: 0.04
+  dur_per_char_max: 0.30
