@@ -1,6 +1,6 @@
 """data_acquisition.config — stage config dataclass
 
-The tested acquisition code (catalog/sampler/puller) expects a `cfg` object with
+The acquisition code (catalog/sampler/puller) expects a `cfg` object with
 these attributes. We keep that dataclass intact and add
 `from_dict`, so the orchestrator can build it from the unified config subsection
 (`cfg.stage("data_acquisition")`) without changing any stage logic.
@@ -19,7 +19,7 @@ class AcquireConfig:
     repo_id: str = "ai4bharat/Kathbath"
     local_dir: str = "fake_kathbath" # reads a directory laid out like <local_dir>/<lang>/<split>-*.parquet.
 
-    languages: List[str] = field(default_factory=lambda: ["hindi", "tamil"])
+    languages: List[str] = field(default_factory=lambda: ["hindi","malayalam" ,"tamil"])
     split: str = "valid"
 
     speakers_per_language: int = 10

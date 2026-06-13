@@ -1,8 +1,7 @@
 """data_acquisition.pipeline 
 
 `run(cfg, logger)` is the stage's uniform entry called by scripts/run.py. It
-builds the stage config from the unified config subsection, then runs the two
-stages across the cost boundary:
+builds the stage config from the unified config subsection, then runs the two stages:
 
     Stage A : build_catalog  -> catalog.parquet
               build_selection -> selection_manifest.jsonl   (seeded, deterministic)
@@ -45,7 +44,7 @@ def run(cfg, logger=None) -> dict:
         "pull": pull_stats,
         "reference_manifest": os.path.join(acfg.out_dir, "reference_manifest.jsonl"),
     }
-    with open(os.path.join(acfg.out_dir, "run_summary.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(acfg.out_dir, "data_acquisition_run_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
     logger.info("Acquisition done in %.1fs: %d clips, %d speakers",
                 summary["elapsed_sec"], sel_summary["total_clips"], sel_summary["total_speakers"])

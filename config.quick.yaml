@@ -1,15 +1,8 @@
-# config.quick.yaml — fast end-to-end smoke of the REAL pipeline on a T4.
-#
-# Same models, same code, same QC thresholds as config.colab.yaml — only the
-# COUNTS and the OUTPUT DIR differ. Once the models are cached (from a prior run),
-# a full §4.2 -> §4.6 pass finishes in minutes instead of hours, so you can verify
-# the whole chain (multi-language pairing, gender balance, manifest schema, resume)
-# without burning a long run.
-#
+# config.quick.yaml — fast end-to-end test of the REAL pipeline on a T4.
+
 # IMPORTANT: out_dir is a SEPARATE directory (out_quick) so this never collides
 # with the real run's checkpoints. The global out_dir below is injected into every
 # stage subsection, and each stage's resume logic keys off the manifests in that dir.
-#
 #   python scripts/run.py --config config.quick.yaml --stages <stage>
 
 # ---- global ----
@@ -22,7 +15,7 @@ data_acquisition:
   source: hf                       # gated; needs HF_TOKEN + accepted Kathbath terms
   repo_id: ai4bharat/Kathbath
   local_dir: fake_kathbath
-  languages: [hindi, malayalam]
+  languages: [hindi, malayalam, tamil]
   split: valid
   speakers_per_language: 2         # 1M + 1F per language
   clips_per_speaker: 2

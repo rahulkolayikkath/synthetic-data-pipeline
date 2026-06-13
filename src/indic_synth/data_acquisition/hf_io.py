@@ -31,8 +31,7 @@ def make_source(cfg, logger):
         raise ValueError(f"Unknown source {cfg.source!r} (use 'hf' or 'local')")
 
     def list_files(lang: str):
-        return sorted(fs.glob(f"{base}/{lang}/{cfg.split}-*.parquet"))
-
+        return sorted(fs.glob(f"{base}/{lang}/{cfg.split}-*.parquet")) # pulls all the valid parquet
     return fs, list_files
 
 

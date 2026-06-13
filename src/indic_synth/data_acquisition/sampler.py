@@ -20,7 +20,8 @@ def _choose_speakers(males, females, others, cfg, rng, logger, lang):
         pool = males + females + others
         return rng.sample(pool, min(per, len(pool)))
 
-    n_f = per // 2
+    #equal spliting between male and female
+    n_f = per // 2 
     n_m = per - n_f
     chosen = rng.sample(males, min(n_m, len(males))) + rng.sample(females, min(n_f, len(females)))
     deficit = per - len(chosen)
@@ -36,7 +37,7 @@ def _choose_speakers(males, females, others, cfg, rng, logger, lang):
 
 
 def build_selection(catalog: pd.DataFrame, cfg, logger):
-    """Stage A.5. Stratify by (language, speaker, gender), then pick clips per
+    """Stratify by (language, speaker, gender), then pick clips per
     speaker. Fully determined by the catalog order + cfg.seed. Writes
     out_dir/selection_manifest.jsonl."""
     rng = random.Random(cfg.seed)
