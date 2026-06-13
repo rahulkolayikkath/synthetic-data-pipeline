@@ -7,17 +7,17 @@
 
 # ---- global ----
 seed: 1234
-out_dir: /content/drive/MyDrive/indic_synth/out_quick   # separate from the real run's .../out
+out_dir: /content/drive/MyDrive/indic_synth/out_representative_sample   # separate from the real run's .../out
 
 # ---- Data Acquisition (Kathbath voice bank) ----
-# 2 langs x 2 speakers = 4 distinct speakers, gender-balanced (1M + 1F per language).
+# 3 langs x 2 speakers = 6 distinct speakers, gender-balanced (1M + 1F per language).
 data_acquisition:
   source: hf                       # gated; needs HF_TOKEN + accepted Kathbath terms
   repo_id: ai4bharat/Kathbath
   local_dir: fake_kathbath
   languages: [hindi, malayalam, tamil]
   split: valid
-  speakers_per_language: 2        # 1M + 1F per language
+  speakers_per_language: 2        # 1M + 1F per language, Total = 6 speakers
   clips_per_speaker: 2
   min_total_speakers: 4
   gender_balance: true
@@ -43,13 +43,12 @@ sentence_generation:
   load_in_4bit: true
   languages:                       # code -> [display name, script in SCRIPT_RANGES]
     hi: [Hindi, Devanagari]
-    #ml: [Malayalam, Malayalam]
-    #ta: [Tamil, Tamil]
+    ml: [Malayalam, Malayalam]
+    ta: [Tamil, Tamil]
   topics:
     - Daily Commute
-    #- Local Cuisine
-  sentence_types: [declarative, interrogative]
-  per_cell_quota: 8                # 1 langs x 1 topic x 2 types x 8 = 16 sentences
+  sentence_types: [declarative, interrogative, imperative, exclamatory]
+  per_cell_quota: 8                # (3langs x 1 topic x 4 types) x 8 = 96 sentences
   sentences_per_call: 5    
   max_attempts_per_cell: 4
   temperature: 0.9
