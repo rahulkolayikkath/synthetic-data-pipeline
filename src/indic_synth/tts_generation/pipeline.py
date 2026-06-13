@@ -126,9 +126,8 @@ def synthesize_pool(cfg: TTSConfig, synth, logger=None) -> dict:
 
         if i % cfg.log_every == 0 or i == n_pending:
             rate = i / max(time.time() - t0, 1e-9)             # attempts/sec
-            eta_min = (n_pending - i) / max(rate, 1e-9) / 60
-            logger.info("[%d/%d] %.1f utt/min, %d ok / %d fail, ETA ~%.0f min",
-                        i, n_pending, rate * 60, stats["synthesized"], stats["failed"], eta_min)
+            logger.info("[%d/%d] Generation speed: %.1f utt/min, %d pass / %d fail",
+                        i, n_pending, rate * 60, stats["synthesized"], stats["failed"])
 
     elapsed = time.time() - t0
     summary = {
