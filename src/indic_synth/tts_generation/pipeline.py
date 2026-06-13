@@ -1,13 +1,9 @@
-"""tts_generation.pipeline — Stage 4.5 entrypoint (the join point).
+"""tts_generation.pipeline 
 
-`run(cfg, logger)` reads prepared_manifest.jsonl (§4.3 references) + sentences.jsonl
-(§4.4 validated text), pairs each sentence with a same-language prepared reference
-(round-robin over that language's speakers for balance), chunks long text at
-sentence boundaries, synthesizes with IndicF5, writes tts_audio/<utt_id>.wav at
-24 kHz, and appends tts_manifest.jsonl in the §4.1 utterance schema (the §4.6 input).
-
-`synthesize_pool` takes the synth callable as an argument so the pairing / chunking /
-manifest machinery is testable on CPU with a fake synthesizer (no IndicF5 load).
+`run(cfg, logger)` reads prepared_manifest.jsonl (reference audio manifest) + sentences.jsonl (validated text)
+pairs each sentence with a same-language prepared reference
+chunks long text at sentence boundaries, synthesizes with IndicF5, writes tts_audio/<utt_id>.wav at
+24 kHz, and appends tts_manifest.jsonl in the utterance schema (that goes as input to the QC)
 """
 from __future__ import annotations
 
