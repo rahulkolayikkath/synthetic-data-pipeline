@@ -49,7 +49,7 @@ sentence_generation:
     - Daily Commute
     #- Local Cuisine
   sentence_types: [declarative, interrogative]
-  per_cell_quota: 8                # 3 langs x 2 topic x 2 types x 8 = 36 sentences
+  per_cell_quota: 8                # 1 langs x 1 topic x 2 types x 8 = 16 sentences
   sentences_per_call: 5    
   max_attempts_per_cell: 4
   temperature: 0.9
