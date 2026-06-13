@@ -17,7 +17,7 @@ data_acquisition:
   local_dir: fake_kathbath
   languages: [hindi, malayalam, tamil]
   split: valid
-  speakers_per_language: 20         # 1M + 1F per language
+  speakers_per_language: 2        # 1M + 1F per language
   clips_per_speaker: 2
   min_total_speakers: 4
   gender_balance: true
