@@ -49,12 +49,12 @@ sentence_generation:
     - Daily Commute
     - Local Cuisine
   sentence_types: [declarative, interrogative]
-  per_cell_quota: 3                # 3 langs x 2 topic x 2 types x 3 = 36 sentences
+  per_cell_quota: 13                # 3 langs x 2 topic x 2 types x 3 = 36 sentences
   sentences_per_call: 12
   max_attempts_per_cell: 4
   temperature: 0.9
   top_p: 0.95
-  max_new_tokens: 256              # smaller cap than the full run -> faster calls
+  max_new_tokens: 300            # smaller cap than the full run -> faster calls
   min_words: 5
   max_words: 20
   script_min_ratio: 0.90
