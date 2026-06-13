@@ -34,7 +34,7 @@ class QCConfig:
     clip_frac_max: float = 1e-3
     clip_run_max: int = 8
     trunc_tail_ms: float = 60.0
-    trunc_tail_ratio: float = 0.25
+    trunc_tail_ratio: float = 0.40                   #0.25 was too strict, 
     loop_min_lag_s: float = 0.30
     loop_pair_sim: float = 0.95
     loop_band_frac: float = 0.85
