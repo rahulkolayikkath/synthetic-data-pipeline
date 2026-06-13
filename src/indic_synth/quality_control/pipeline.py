@@ -119,10 +119,9 @@ def run(cfg, logger=None, run_asr=True, run_speaker=True) -> dict:
 
         if i % qcfg.log_every == 0 or i == n_pending:
             rate = i / max(time.time() - t0, 1e-9)             # utts/sec
-            eta_min = (n_pending - i) / max(rate, 1e-9) / 60
-            logger.info("[%d/%d] %.1f utt/min, %d pass / %d fail (%.0f%% pass), ETA ~%.0f min",
+            logger.info("[%d/%d] Validation speed: %.1f utt/min, %d pass / %d fail (%.0f%% pass)",
                         i, n_pending, rate * 60, stats["passed"], stats["failed"],
-                        100 * stats["passed"] / max(stats["checked"], 1), eta_min)
+                        100 * stats["passed"] / max(stats["checked"], 1))
 
     summary = {
         "stage": "quality_control",

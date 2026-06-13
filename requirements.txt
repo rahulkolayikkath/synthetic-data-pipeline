@@ -41,4 +41,4 @@ safetensors>=0.4
 speechbrain>=1.0         # ECAPA speaker verification
 jiwer>=3.0               # CER computation (falls back to a builtin if absent)
 indic-nlp-library>=0.92  # AI4Bharat IndicNormalizer for CER text normalization
-onnxruntime
+onnxruntime-gpu          # indic-conformer ASR is ONNX; GPU build adds CUDAExecutionProvider (T4). Do NOT also install plain onnxruntime — they conflict.
