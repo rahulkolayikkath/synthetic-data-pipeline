@@ -1,7 +1,7 @@
-"""sentence_generation.prompting — prompt construction & output parsing (§4.4).
+"""sentence_generation.prompting — prompt construction & output parsing.
 
 Builds the per-cell instruction prompt and splits a completion into candidate
-sentences, stripping list scaffolding. Ported verbatim from the notebook.
+sentences, stripping list scaffolding.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ Write exactly {n} {stype} sentences ({SENTENCE_TYPE_GUIDE[stype]}) about: "{topi
 
 Strict rules:
 - Write ONLY in {lang_name}, using the {script_name} script.
-- Each sentence must be at most 20 words.
+- Each sentence must be at min 5 words and at most 20 words.
 - Write every number, date, currency amount, unit, and abbreviation as WORDS in {lang_name}. Do NOT use any digits.
 - Use natural, everyday phrasing. Make all sentences distinct from one another.
 - Output one sentence per line. No numbering, no bullets, no quotation marks, no English, no extra commentary."""

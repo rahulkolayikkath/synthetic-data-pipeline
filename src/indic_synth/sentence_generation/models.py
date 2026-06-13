@@ -1,9 +1,7 @@
-"""sentence_generation.models — the Indic LLM wrapper (§4.4).
+"""sentence_generation.models — the Indic LLM wrapper
 
-Loads google/gemma-3-12b-it in 4-bit NF4 (fits a T4) and returns a seeded
-`generate(prompt, seed) -> str` callable. Heavy deps (torch/transformers) are
-imported lazily so the rest of the module (validation/prompting) stays importable
-on a CPU-only box. Ported from the notebook's model cell.
+Loads google/gemma-3-12b-it in 4-bit NF4 (fits a T4) and returns a seeded `generate(prompt, seed) -> str` callable. 
+Heavy deps (torch/transformers) are imported lazily so the rest of the module (validation/prompting) stays importable on a CPU-only box.
 """
 from __future__ import annotations
 

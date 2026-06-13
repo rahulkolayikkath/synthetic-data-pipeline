@@ -9,7 +9,7 @@
 seed: 1234
 out_dir: /content/drive/MyDrive/indic_synth/out_quick   # separate from the real run's .../out
 
-# ---- §4.2 data acquisition (Kathbath voice bank) ----
+# ---- Data Acquisition (Kathbath voice bank) ----
 # 2 langs x 2 speakers = 4 distinct speakers, gender-balanced (1M + 1F per language).
 data_acquisition:
   source: hf                       # gated; needs HF_TOKEN + accepted Kathbath terms
@@ -37,15 +37,17 @@ audio_engineering:
   max_ref_sec: 15.0
   subtype: PCM_16
 
-# ---- §4.4 synthetic sentence generation (Gemma-3-12b-it 4-bit) ----
+# ---- Synthetic sentence generation (Gemma-3-12b-it 4-bit) ----
 sentence_generation:
   model_id: google/gemma-3-12b-it
   load_in_4bit: true
   languages:                       # code -> [display name, script in SCRIPT_RANGES]
     hi: [Hindi, Devanagari]
     ml: [Malayalam, Malayalam]
+    ta: [Tamil, Tamil]
   topics:
     - Daily Commute
+    - Local Cuisine
   sentence_types: [declarative, interrogative]
   per_cell_quota: 3                # 2 langs x 1 topic x 2 types x 3 = 12 sentences
   sentences_per_call: 12
@@ -53,7 +55,7 @@ sentence_generation:
   temperature: 0.9
   top_p: 0.95
   max_new_tokens: 256              # smaller cap than the full run -> faster calls
-  min_words: 3
+  min_words: 5
   max_words: 20
   script_min_ratio: 0.90
   min_type_token_ratio: 0.55

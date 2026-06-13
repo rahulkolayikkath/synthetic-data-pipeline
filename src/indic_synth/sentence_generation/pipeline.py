@@ -1,9 +1,8 @@
-"""sentence_generation.pipeline — Stage 4.4 entrypoint.
+"""sentence_generation.pipeline
 
 `run(cfg, logger)` generates a balanced, validated pool of Indic sentences by
 looping over a grid of (language x topic x sentence_type) cells until each hits
-its quota. Writes the checkpointed sentences.jsonl (the §4.5 input) + a state file
-of rejection counters, and returns a QC-yield summary.
+its quota. Writes the checkpointed sentences.jsonl (the TTS generation input) + a state file of rejection counters, and returns a QC-yield summary.
 
 `generate_pool` is split out and takes the LLM generator + validation resources as
 arguments, so the grid/checkpoint/validation machinery can be tested on CPU with a

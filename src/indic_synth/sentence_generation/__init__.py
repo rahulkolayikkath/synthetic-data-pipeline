@@ -1,4 +1,4 @@
-"""sentence_generation — §4.4 synthetic sentence generation.
+"""sentence_generation — synthetic sentence generation using LLM
 
 Generates validated, diverse Indic sentences that IndicF5 will later speak.
 Loops over a grid of (language x topic x sentence_type) cells, generating per

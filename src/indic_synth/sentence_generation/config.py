@@ -1,8 +1,6 @@
-"""sentence_generation.config — stage config dataclass (§4.4).
+"""sentence_generation.config — stage config dataclass
 
-Ported from the notebook's Config. `languages` maps a language code to
-[display_name, script_name] (the YAML lists deserialize as lists, indexed [0]/[1]
-exactly like the notebook's tuples). pool/state paths live under the shared out_dir.
+
 """
 from __future__ import annotations
 
@@ -19,9 +17,11 @@ class SentenceConfig:
     load_in_4bit: bool = True
 
     # ---- generation grid: code -> [display name, script in SCRIPT_RANGES] ----
+    # `languages` maps a language code to [display_name, script_name] 
     languages: Dict[str, List[str]] = field(default_factory=lambda: {
         "hi": ["Hindi", "Devanagari"],
         "ml": ["Malayalam", "Malayalam"],
+        "ta": ["Tamil", "Tamil"],
     })
     topics: List[str] = field(default_factory=lambda: [
         "Daily Commute", "Local Cuisine", "Tech Troubleshooting", "Weather Reports",
@@ -42,7 +42,7 @@ class SentenceConfig:
     max_new_tokens: int = 512
 
     # ---- validation thresholds ----
-    min_words: int = 3
+    min_words: int = 5
     max_words: int = 20
     script_min_ratio: float = 0.90
     min_type_token_ratio: float = 0.55
@@ -51,6 +51,7 @@ class SentenceConfig:
     langid_min_conf: float = 0.50
     reject_unnormalized_numbers: bool = True
 
+    # Sentance similarity check for deduplication 
     embed_model_id: str = "sentence-transformers/LaBSE"
 
     base_seed: int = 1234

@@ -1,12 +1,10 @@
-"""sentence_generation.validation — the programmatic validation gate (§4.4).
+"""sentence_generation.validation
 
-The source of truth for sentence quality (not the prompt). Gates run cheapest-first:
-degeneracy -> number normalization -> script ratio -> language-ID -> dedup. Every
-rejection returns a reason string (which becomes the QC-yield table).
+The source of truth for sentence quality. 
+Oder of the validation gates are as follows:
+degeneracy -> number normalization -> script ratio -> language-ID -> dedup. 
+Every rejection returns a reason string (which becomes the QC-yield table).
 
-Ported from the notebook; the only change is that the threshold-reading functions
-(`is_degenerate`, `validate_sentence`) now take `cfg` explicitly instead of a module
-global, so they're testable and reusable.
 """
 from __future__ import annotations
 
@@ -128,7 +126,7 @@ class Deduper:
 
 
 def validate_sentence(text, lang_code, script_name, deduper, langid, cfg):
-    """Return (ok, reason). Order = cheapest gate first, embedding dedup last."""
+    """Return (ok, reason)"""
     if not text or len(text) < 2:
         return False, "empty"
 
