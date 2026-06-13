@@ -60,7 +60,7 @@ sentence_generation:
   max_attempts_per_cell: 8
   temperature: 0.9
   top_p: 0.95
-  max_new_tokens: 512
+  max_new_tokens: 300             # 13 sentance *  max length 20 = 260
   min_words: 5
   max_words: 20
   script_min_ratio: 0.90
