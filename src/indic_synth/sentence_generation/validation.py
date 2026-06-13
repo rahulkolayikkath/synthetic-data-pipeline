@@ -74,6 +74,13 @@ class LanguageIdentifier:
     """Confirms the *language* (not just the script). fastText lid.176 returns ISO codes
     (hi, ml, ta, bn, mr, ...) that match our language keys."""
 
+    # IndicLID emits FLORES-style `<iso639-3>_<Script>` labels (e.g. hin_Deva); map the
+    # iso639-3 part back to the 2-letter language keys used everywhere else.
+    _ISO3_TO_ISO1 = {
+        "hin": "hi", "mal": "ml", "tam": "ta", "ben": "bn", "mar": "mr",
+        "tel": "te", "kan": "kn", "guj": "gu", "pan": "pa", "ory": "or",
+    }
+
     def __init__(self, backend: str = "fasttext", model_dir: str = None):
         self.backend = backend
         if backend == "fasttext":
@@ -85,14 +92,20 @@ class LanguageIdentifier:
                     "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin", path)
             self.model = fasttext.load_model(path)
         elif backend == "indiclid":
-            # Upgrade path: AI4Bharat IndicLID — better on Indic + romanized text and on
-            # languages that share a script. https://github.com/AI4Bharat/IndicLID
-            raise NotImplementedError("Plug in IndicLID here (see notebook final cell).")
+            # AI4Bharat IndicLID — better on Indic + romanized text and on languages
+            from IndicLID import IndicLID
+            self.model = IndicLID(input_threshold=0.5, roman_lid_threshold=0.6)
         else:
             raise ValueError(f"unknown langid backend: {backend}")
 
     def predict(self, text: str):
-        labels, probs = self.model.predict(text.replace("\n", " "), k=1)
+        text = text.replace("\n", " ")
+        if self.backend == "indiclid":
+            # batch_predict returns [(input_text, label, score, model_used), ...]
+            _, label, score, _ = self.model.batch_predict([text], 1)[0]
+            iso3 = label.split("_")[0]
+            return self._ISO3_TO_ISO1.get(iso3, iso3), float(score)
+        labels, probs = self.model.predict(text, k=1)
         return labels[0].replace("__label__", ""), float(probs[0])
 
 
