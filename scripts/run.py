@@ -76,9 +76,8 @@ def main(argv=None):
     }
     with open(os.path.join(cfg.out_dir, "pipeline_summary.json"), "w", encoding="utf-8") as f:
         json.dump(pipeline_summary, f, indent=2, ensure_ascii=False)
-    logger.info("Pipeline done in %.1fs. Final dataset: %s",
-                pipeline_summary["elapsed_sec"],
-                os.path.join(cfg.out_dir, "dataset_manifest.jsonl"))
+    logger.info("Requested stages in pipeline done in %.1fs.",
+                pipeline_summary["elapsed_sec"])
 
 
 if __name__ == "__main__":
