@@ -3,7 +3,7 @@
 The per-clip signal chain that turns a raw Kathbath clip into what IndicF5 expects
 (24 kHz, mono, normalized WAV), and the metering/normalization helpers it uses.
 
-Silent-resampling-bug guards (the point of this stage) live in `process_clip`:
+Silent-resampling-bug guards live in `process_clip`:
 decode at native rate, resample explicitly, assert post-conditions, read back the
 written header. See process_clip for the step-by-step.
 """
@@ -115,8 +115,7 @@ def rms_dbfs(y):
 
 # ----------------------------- normalization -------------------------------- #
 def normalize(y, method, target_dbfs, ceiling_dbfs):
-    """Returns (y_out, gain_db). Peak method can never clip; rms/lufs apply a peak
-    guard so they can't either."""
+    """Returns (y_out, gain_db). Peak method can never clip; rms/lufs apply a peak guard so they can't either."""
     if method == "peak":
         peak = float(np.max(np.abs(y)))
         if peak <= 0:
