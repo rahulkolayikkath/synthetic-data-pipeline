@@ -1,8 +1,8 @@
-"""audio_engineering.pipeline — Stage 4.3 entrypoint.
+"""audio_engineering.pipeline 
 
-`run(cfg, logger)` reads reference_manifest.jsonl (the downloaded clips from §4.2),
+`run(cfg, logger)` reads reference_manifest.jsonl,
 runs each through prepare.process_clip, and writes prepared_audio/<ref_id>.wav +
-prepared_manifest.jsonl (input to §4.5) + prepare_summary.json. Resumable per
+prepared_manifest.jsonl  + prepare_summary.json. Resumable per
 ref_id via common.checkpoint; partial failures are isolated and logged.
 """
 from __future__ import annotations
@@ -20,7 +20,7 @@ from .prepare import process_clip
 
 
 def run(cfg, logger=None) -> dict:
-    """Run §4.3 end-to-end. `cfg` is the unified Config (has `.stage(...)`)."""
+    """Runs end-to-end. `cfg` is the unified Config."""
     logger = logger or get_logger("prepare")
     acfg = AudioConfig.from_dict(cfg.stage("audio_engineering"))
 
@@ -71,7 +71,7 @@ def run(cfg, logger=None) -> dict:
     summary = {"stage": "audio_engineering", "elapsed_sec": round(time.time() - t0, 2),
                "target_sr": acfg.target_sr, "norm": acfg.norm, "trim": acfg.trim, **stats,
                "prepared_manifest": out_manifest}
-    with open(os.path.join(out_dir, "prepare_summary.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(out_dir, "prepare_refaudio_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
     logger.info("Prepare complete: %s", json.dumps(summary, ensure_ascii=False))
     return summary

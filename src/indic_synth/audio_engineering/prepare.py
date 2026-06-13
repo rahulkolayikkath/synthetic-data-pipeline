@@ -1,9 +1,7 @@
-"""audio_engineering.prepare — DSP for reference-audio engineering (§4.3).
+"""audio_engineering.prepare (DSP for reference-audio engineering)
 
 The per-clip signal chain that turns a raw Kathbath clip into what IndicF5 expects
 (24 kHz, mono, normalized WAV), and the metering/normalization helpers it uses.
-Ported verbatim from the tested prepare_refs.py; the only change is that the driver
-loop and argparse/logging live in pipeline.py / common now.
 
 Silent-resampling-bug guards (the point of this stage) live in `process_clip`:
 decode at native rate, resample explicitly, assert post-conditions, read back the
@@ -204,7 +202,7 @@ def process_clip(src_path, dst_path, cfg, logger):
 
     y, resample_method = resample(y, src_sr, cfg.target_sr)
     if src_sr < cfg.target_sr:
-        flags.append("resampled_up")               # honest: can't add real >src_sr/2 content
+        flags.append("resampled_up")               
     elif src_sr > cfg.target_sr:
         flags.append("resampled_down")
 

@@ -1,8 +1,4 @@
-"""audio_engineering.config — stage config dataclass (§4.3).
-
-Holds the attributes process_clip + the driver expect (target_sr, norm, etc.).
-`in_manifest` defaults to reference_manifest.jsonl inside out_dir — that's where
-§4.2 writes it, and since every stage shares out_dir the default just works.
+"""audio_engineering.config — stage config dataclass
 """
 from __future__ import annotations
 
