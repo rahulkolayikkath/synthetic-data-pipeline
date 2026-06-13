@@ -1,5 +1,5 @@
 # requirements.txt — runtime dependencies for indic_synth.
-# Installed in Colab Cell 2:  !pip install -r requirements.txt ; !pip install -e .
+# For Instal in Colab Cell:  !pip install -r requirements.txt ; !pip install -e .
 
 # ---- core / common (§4.1) ----
 pyyaml>=6.0
