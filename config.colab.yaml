@@ -55,12 +55,12 @@ sentence_generation:
     - Education and School
     - Banking and Money
   sentence_types: [declarative, interrogative, imperative, exclamatory]
-  per_cell_quota: 13              # 2 langs x 10 topics x 4 types x 13 ~= 1040 sentences
-  sentences_per_call: 12
+  per_cell_quota: 10              # 3 langs x 10 topics x 4 types x 10 ~= 1200 sentences
+  sentences_per_call: 5
   max_attempts_per_cell: 8
   temperature: 0.9
   top_p: 0.95
-  max_new_tokens: 300             # 13 sentance *  max length 20 = 260
+  max_new_tokens: 256             # 12 sentance *  max length 20 = 240
   min_words: 5
   max_words: 20
   script_min_ratio: 0.90
@@ -79,6 +79,7 @@ tts_generation:
   lang_map:                        # sentence code -> reference-manifest language name
     hi: hindi
     ml: malayalam
+    ta: tamil
 
 # ---- §4.6 quality control (3 gates) ----
 quality_control:

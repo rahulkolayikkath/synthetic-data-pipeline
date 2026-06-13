@@ -1,4 +1,4 @@
-"""tts_generation — §4.5 TTS generation with IndicF5.
+"""tts_generation — TTS generation with IndicF5.
 
 Synthesizes each utterance: IndicF5 (ai4bharat/IndicF5) speaking a generated
 sentence in the voice of a real Kathbath speaker, conditioned on that speaker's

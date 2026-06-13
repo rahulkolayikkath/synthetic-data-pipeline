@@ -49,8 +49,8 @@ sentence_generation:
     - Daily Commute
     - Local Cuisine
   sentence_types: [declarative, interrogative]
-  per_cell_quota: 13                # 3 langs x 2 topic x 2 types x 3 = 36 sentences
-  sentences_per_call: 12
+  per_cell_quota: 10                # 3 langs x 2 topic x 2 types x 3 = 36 sentences
+  sentences_per_call: 5
   max_attempts_per_cell: 4
   temperature: 0.9
   top_p: 0.95
@@ -74,6 +74,7 @@ tts_generation:
   lang_map:                        # sentence code -> reference-manifest language name
     hi: hindi
     ml: malayalam
+    ta: tamil
 
 # ---- §4.6 quality control (3 gates) ----
 quality_control:

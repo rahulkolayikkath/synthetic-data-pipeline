@@ -1,7 +1,7 @@
 """tts_generation.config — stage config dataclass (§4.5).
 
-`lang_map` bridges the two naming conventions in the pipeline: sentences (§4.4) use
-ISO codes (hi, ml) while prepared references (§4.2/§4.3) carry Kathbath folder names
+`lang_map` bridges the two naming conventions in the pipeline: sentences generation use
+ISO codes (hi, ml) while prepared references audios manifest carry Kathbath folder names
 (hindi, malayalam). Pairing groups references by the mapped name so a speaker is
 only ever paired with sentences in their own language.
 """
@@ -23,7 +23,7 @@ class TTSConfig:
     log_every: int = 25                  # heartbeat: log progress every N utterances
     # sentence language code -> reference-manifest language name
     lang_map: Dict[str, str] = field(default_factory=lambda: {
-        "hi": "hindi", "ml": "malayalam",
+        "hi": "hindi", "ml": "malayalam", "ta": "tamil"
     })
 
     @classmethod
