@@ -55,7 +55,7 @@ sentence_generation:
     - Education and School
     - Banking and Money
   sentence_types: [declarative, interrogative, imperative, exclamatory]
-  per_cell_quota: 10               # 3 langs x 10 topics x 4 types x 13 ~= 1040 sentences
+  per_cell_quota: 8               # 3 langs x 10 topics x 4 types x 10 ~= 10400 sentences
   sentences_per_call: 5
   max_attempts_per_cell: 8
   temperature: 0.9

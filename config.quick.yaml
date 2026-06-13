@@ -43,14 +43,14 @@ sentence_generation:
   load_in_4bit: true
   languages:                       # code -> [display name, script in SCRIPT_RANGES]
     hi: [Hindi, Devanagari]
-    ml: [Malayalam, Malayalam]
-    ta: [Tamil, Tamil]
+    #ml: [Malayalam, Malayalam]
+    #ta: [Tamil, Tamil]
   topics:
     - Daily Commute
-    - Local Cuisine
+    #- Local Cuisine
   sentence_types: [declarative, interrogative]
-  per_cell_quota: 10                # 3 langs x 2 topic x 2 types x 3 = 36 sentences
-  sentences_per_call: 5
+  per_cell_quota: 8                # 3 langs x 2 topic x 2 types x 8 = 36 sentences
+  sentences_per_call: 5    
   max_attempts_per_cell: 4
   temperature: 0.9
   top_p: 0.95
