@@ -60,7 +60,7 @@ sentence_generation:
   script_min_ratio: 0.90
   min_type_token_ratio: 0.55
   near_dup_threshold: 0.92
-  langid_backend: indiclid  # fasttext or indiclid
+  langid_backend: fasttext # indiclid
   langid_min_conf: 0.50
   embed_model_id: sentence-transformers/LaBSE
 
