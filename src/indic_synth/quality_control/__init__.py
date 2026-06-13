@@ -1,4 +1,4 @@
-"""quality_control — §4.6 quality control & validation.
+"""quality_control — Quality control & validation.
 
 Implements three independent gates per synthetic utterance:
     1. Content fidelity — ASR transcribe + CER vs intended text; reject CER > 0.15

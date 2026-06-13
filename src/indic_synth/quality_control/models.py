@@ -1,11 +1,11 @@
-"""quality_control.models — ASR & speaker-verification wrappers (§4.6).
+"""quality_control.models — ASR & speaker-verification wrappers
 
 Lazy-loaded, cached wrappers for the two model-backed gates:
   - indic-conformer-600m  -> transcribe (content fidelity / CER)
   - ECAPA (speechbrain)   -> speaker_cosine (speaker fidelity)
 
 Loaded via lru_cache so importing the package is cheap and the DSP checks in
-checks.py run with no model download. Ported verbatim from qc_validation.
+checks.py run with no model download. 
 """
 from __future__ import annotations
 

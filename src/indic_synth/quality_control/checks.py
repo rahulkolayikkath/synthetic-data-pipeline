@@ -1,9 +1,8 @@
-"""quality_control.checks — model-free gates + result containers (§4.6).
+"""quality_control.checks — model-free gates + result containers
 
 The hard-failure DSP checks (silence/clipping/truncation/looping/dur-per-char),
-the text normalization + CER, and the CheckResult/UtteranceQC containers. All
-pure DSP/text, so they run with no model download. Ported verbatim from the
-tested qc_validation module.
+CheckResult/UtteranceQC containers. 
+All pure DSP/tex methods, so they run with no model download.
 """
 from __future__ import annotations
 
@@ -52,8 +51,7 @@ class UtteranceQC:
 def load_audio(path: str, target_sr: int):
     """Load -> mono -> float32 in [-1, 1] -> resample to target_sr.
 
-    Resampling is the #1 source of *silent* bugs, so we always read the real sr,
-    refuse to 'resample' by reinterpreting, and return the actual sr produced.
+    Resampling, so we always read the real sr, refuse to 'resample' by reinterpreting, and return the actual sr produced.
     """
     import librosa
     import soundfile as sf
@@ -187,18 +185,45 @@ def check_duration_per_char(wav, sr, text: str, cfg) -> CheckResult:
 
 
 # ----------------------------- text normalization + CER -------------------- #
-def normalize_text(text: str) -> str:
-    """NFC-normalize (critical for Indic combining chars), collapse whitespace,
-    drop common punctuation. Swap in AI4Bharat IndicNormalizer for production."""
+_NORMALIZER_CACHE: dict = {}
+
+def _indic_normalizer(lang: str):
+    """Return a cached AI4Bharat IndicNormalizer for `lang`, or None if the
+    library is missing or the language is unsupported. Cached (incl. misses) so
+    the per-utterance QC loop never re-pays the factory/import cost."""
+    if lang in _NORMALIZER_CACHE:
+        return _NORMALIZER_CACHE[lang]
+    norm = None
+    try:
+        from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
+        norm = IndicNormalizerFactory().get_normalizer(lang)
+    except Exception:
+        norm = None                                  # not installed / lang unsupported
+    _NORMALIZER_CACHE[lang] = norm
+    return norm
+
+
+def normalize_text(text: str, lang: Optional[str] = None) -> str:
+    """Canonicalize for CER: AI4Bharat IndicNormalizer (when `lang` is given and
+    the lib is available) -> NFC -> drop punctuation -> collapse whitespace.
+
+    The IndicNormalizer is language-specific, so callers that know the language
+    (the QC pipeline does) should pass it; without it we fall back to NFC only."""
+    norm = _indic_normalizer(lang) if lang else None
+    if norm is not None:
+        try:
+            text = norm.normalize(text)
+        except Exception:
+            pass                                     # never let normalization fail a clip
     text = unicodedata.normalize("NFC", text)
     for ch in "।.,?!\"'()[]{}:;-—…":
         text = text.replace(ch, " ")
     return " ".join(text.split()).strip()
 
 
-def compute_cer(reference: str, hypothesis: str) -> float:
+def compute_cer(reference: str, hypothesis: str, lang: Optional[str] = None) -> float:
     """Character error rate after normalization. Uses jiwer if available."""
-    ref, hyp = normalize_text(reference), normalize_text(hypothesis)
+    ref, hyp = normalize_text(reference, lang), normalize_text(hypothesis, lang)
     if not ref:
         return 1.0 if hyp else 0.0
     try:

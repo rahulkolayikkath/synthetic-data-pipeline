@@ -1,8 +1,8 @@
-"""quality_control.config — stage config dataclass (§4.6).
+"""quality_control.config — stage config dataclass
 
 The QCConfig the tested checks expect: model ids, sample rates, the three spec
 thresholds (CER<=0.15, speaker cos>=0.60, dur/char in [0.04,0.30]), and the
-hard-failure heuristic knobs. Ported verbatim; only `from_dict` is added.
+hard-failure heuristic knobs
 """
 from __future__ import annotations
 

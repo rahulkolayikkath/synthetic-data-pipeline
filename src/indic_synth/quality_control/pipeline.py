@@ -52,7 +52,7 @@ def validate_utterance(utt_id, synth_path, intended_text, lang_code, ref_path=No
         try:
             from .models import transcribe
             transcript = transcribe(wav, sr, lang_code, cfg)
-            cer = C.compute_cer(intended_text, transcript)
+            cer = C.compute_cer(intended_text, transcript, lang_code)
             checks.append(C.CheckResult("cer", cer <= cfg.cer_max, metric=cer,
                                         detail=f"CER={cer:.3f} (max {cfg.cer_max})"))
             checks.append(C.detect_text_repetition(transcript, cfg))
