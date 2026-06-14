@@ -34,6 +34,15 @@ sys.path.insert(0, os.path.join(ROOT, "src"))
 
 from indic_synth.common.manifest import read_jsonl  # noqa: E402
 
+# ---- display labels (spaces let long names wrap in the PDF instead of overflowing) ----
+STAGE_LABEL = {
+    "data_acquisition": "Data Acquisition",
+    "audio_engineering": "Audio Engineering",
+    "sentence_generation": "Sentence Generation",
+    "tts_generation": "TTS Generation",
+    "quality_control": "Quality Control",
+}
+
 # ---- canonical filenames each stage writes into out_dir ----
 F_ACQUIRE = "data_acquisition_run_summary.json"
 F_AUDIO = "prepare_refaudio_summary.json"
@@ -380,8 +389,9 @@ def section_throughput(out_dir):
     have_split = False
     for name, fname in stage_files:
         s = _load_json(os.path.join(out_dir, fname))
+        label_stage = STAGE_LABEL.get(name, name)
         if not s:
-            rows.append([name, "—", "—", "—", "—", "_missing_", "—"])
+            rows.append([label_stage, "—", "—", "—", "—", "_missing_", "—"])
             continue
         sec = float(s.get("elapsed_sec") or 0)          # actual wall-clock
         total_sec += sec
@@ -401,7 +411,7 @@ def section_throughput(out_dir):
             rate = f"{n / (sec / 60):.1f} {label}/min"
         else:
             rate = "n/a"
-        rows.append([name, f"{sec:.1f}", proc_str, load_str,
+        rows.append([label_stage, f"{sec:.1f}", proc_str, load_str,
                      f"{sec / 3600:.4f}", f"{n} {label}", rate])
     L += _table(["stage", "elapsed (s)", "process (s)", "model load (s)",
                  "T4 GPU-hr", "items", "throughput"], rows)
@@ -445,7 +455,7 @@ body { font-family: Helvetica, Arial, sans-serif; font-size: 9pt; color: #222; }
 h1 { font-size: 16pt; } h2 { font-size: 13pt; margin-top: 14px; }
 h3 { font-size: 11pt; } h4 { font-size: 10pt; }
 table { border-collapse: collapse; width: 100%; margin: 6px 0; }
-th, td { border: 1px solid #bbb; padding: 3px 5px; text-align: left; }
+th, td { border: 1px solid #bbb; padding: 3px 4px; text-align: left; font-size: 8pt; }
 th { background: #eee; }
 code { font-family: Courier, monospace; font-size: 8.5pt; }
 em { color: #555; }
@@ -482,9 +492,10 @@ def write_pdf(markdown_text, pdf_path):
 def build_report(out_dir):
     lines = ["# Synthetic Speech Dataset — Run Report", "",
              f"_out_dir: `{out_dir}`_", ""]
-    lines += section_datacard(out_dir)
-    lines += section_quality(out_dir)
-    lines += section_throughput(out_dir)
+    for section in (section_datacard, section_quality, section_throughput):
+        lines += section(out_dir)
+        if lines and lines[-1] != "":
+            lines.append("")   # ensure a blank line so the next heading can't merge into a table
     return "\n".join(lines)
 
 
