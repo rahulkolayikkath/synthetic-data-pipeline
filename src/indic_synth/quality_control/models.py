@@ -15,7 +15,37 @@ import numpy as np
 
 
 @lru_cache(maxsize=1)
+def _disable_jit_fuser() -> None:
+    """Disable TorchScript's tensor-expression / nvFuser JIT fusion.
+
+    The STFT front-end inside ECAPA and IndicConformer produces complex tensors;
+    on some torch/CUDA combos the JIT fuser emits invalid CUDA for the complex
+    `abs` ("name followed by '::' must be a class or namespace name" referencing
+    c10::complex<float>) and the model call dies. Turning the fuser off forces the
+    eager path. Each call is guarded so it is a no-op on torch versions that lack
+    a given knob. Cached so it runs exactly once, before any model executes.
+    """
+    import torch
+
+    for fn, args in [
+        (getattr(torch._C, "_jit_set_texpr_fuser_enabled", None), (False,)),
+        (getattr(torch._C, "_jit_override_can_fuse_on_cpu", None), (False,)),
+        (getattr(torch._C, "_jit_override_can_fuse_on_gpu", None), (False,)),
+        (getattr(torch._C, "_jit_set_nvfuser_enabled", None), (False,)),
+        (getattr(torch._C, "_jit_set_profiling_mode", None), (False,)),
+        (getattr(torch._C, "_jit_set_profiling_executor", None), (False,)),
+    ]:
+        if fn is None:
+            continue
+        try:
+            fn(*args)
+        except Exception:
+            pass
+
+
+@lru_cache(maxsize=1)
 def _load_asr(model_id: str, device: str):
+    _disable_jit_fuser()
     from transformers import AutoModel
     model = AutoModel.from_pretrained(model_id, trust_remote_code=True)
     try:
@@ -27,6 +57,7 @@ def _load_asr(model_id: str, device: str):
 
 @lru_cache(maxsize=1)
 def _load_spk(model_id: str, device: str):
+    _disable_jit_fuser()
     from speechbrain.inference.speaker import EncoderClassifier
     return EncoderClassifier.from_hparams(source=model_id, run_opts={"device": device})
 
