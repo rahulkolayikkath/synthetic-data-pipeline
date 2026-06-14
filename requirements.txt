@@ -42,3 +42,8 @@ speechbrain>=1.0         # ECAPA speaker verification
 jiwer>=3.0               # CER computation (falls back to a builtin if absent)
 indic-nlp-library>=0.92  # AI4Bharat IndicNormalizer for CER text normalization
 onnxruntime-gpu          # indic-conformer ASR is ONNX; GPU build adds CUDAExecutionProvider (T4). Do NOT also install plain onnxruntime — they conflict.
+
+# ---- reporting (scripts/generate_report.py PDF export; optional) ----
+markdown>=3.5            # Markdown -> HTML (tables extension)
+xhtml2pdf>=0.2.11        # HTML -> PDF (reportlab backend); skipped gracefully if absent
+svglib<1.6              # pin: svglib>=1.6 pulls rlpycairo/pycairo (needs system cairo); <1.6 stays pure-Python

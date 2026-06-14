@@ -15,9 +15,11 @@ Run from a Colab cell:
     python scripts/generate_report.py --config config.yaml
     python scripts/generate_report.py --out_dir /content/drive/MyDrive/indic_synth/out_representative_sample
 
-The report is written to <out_dir>/REPORT.md and also printed to stdout.
-Stages can be run one-by-one, so any missing summary/manifest is reported as
-"unavailable" instead of crashing. Stdlib only — no pandas/numpy needed.
+The report is written to <out_dir>/REPORT.md and also printed to stdout. A PDF
+(<out_dir>/REPORT.pdf) is written too, best-effort, when `markdown` + `xhtml2pdf`
+are installed (pass --no-pdf to skip). Stages can be run one-by-one, so any missing
+summary/manifest is reported as "unavailable" instead of crashing. The report itself
+is stdlib-only; only the optional PDF export needs the two extra packages.
 """
 from __future__ import annotations
 
@@ -435,6 +437,46 @@ def section_throughput(out_dir):
 
 
 # --------------------------------------------------------------------------- #
+# PDF (best-effort: markdown -> HTML -> PDF via markdown + xhtml2pdf)
+# --------------------------------------------------------------------------- #
+_PDF_CSS = """
+@page { size: A4; margin: 1.5cm; }
+body { font-family: Helvetica, Arial, sans-serif; font-size: 9pt; color: #222; }
+h1 { font-size: 16pt; } h2 { font-size: 13pt; margin-top: 14px; }
+h3 { font-size: 11pt; } h4 { font-size: 10pt; }
+table { border-collapse: collapse; width: 100%; margin: 6px 0; }
+th, td { border: 1px solid #bbb; padding: 3px 5px; text-align: left; }
+th { background: #eee; }
+code { font-family: Courier, monospace; font-size: 8.5pt; }
+em { color: #555; }
+"""
+
+
+def write_pdf(markdown_text, pdf_path):
+    """Render the Markdown report to a PDF. Best-effort: returns the path on success,
+    or None (with a printed note) if the optional deps aren't installed."""
+    try:
+        import markdown as _md
+        from xhtml2pdf import pisa
+    except ImportError:
+        print("[pdf skipped — install the optional deps: pip install markdown xhtml2pdf]")
+        return None
+
+    html_body = _md.markdown(markdown_text, extensions=["tables"])
+    html = f"<html><head><style>{_PDF_CSS}</style></head><body>{html_body}</body></html>"
+    try:
+        with open(pdf_path, "wb") as f:
+            status = pisa.CreatePDF(html, dest=f)
+    except Exception as exc:                          # never fail the run over a PDF
+        print(f"[pdf skipped — render error: {exc}]")
+        return None
+    if status.err:
+        print("[pdf skipped — xhtml2pdf reported errors]")
+        return None
+    return pdf_path
+
+
+# --------------------------------------------------------------------------- #
 # main
 # --------------------------------------------------------------------------- #
 def build_report(out_dir):
@@ -454,6 +496,8 @@ def main(argv=None):
                     help="folder holding the stage summaries + manifests (overrides config)")
     ap.add_argument("--out", default=None,
                     help="report path (default: <out_dir>/REPORT.md)")
+    ap.add_argument("--no-pdf", action="store_true",
+                    help="skip the PDF; write only Markdown")
     args = ap.parse_args(argv)
 
     out_dir = args.out_dir
@@ -469,6 +513,11 @@ def main(argv=None):
 
     print(report)
     print(f"\n[report written to {out_path}]")
+
+    if not args.no_pdf:
+        pdf_path = os.path.splitext(out_path)[0] + ".pdf"
+        if write_pdf(report, pdf_path):
+            print(f"[pdf written to {pdf_path}]")
 
 
 if __name__ == "__main__":
