@@ -30,6 +30,36 @@ A gated `HF_TOKEN` is needed for Kathbath and Gemma-3 (`huggingface_hub` login o
 `export HF_TOKEN=...`), plus accepting the Kathbath dataset terms and Gemma-3 license.
 Inspect any manifest with `python scripts/inspect_manifest.py <manifest.jsonl>`.
 
+## Installable CLI & config validation
+
+`pip install -e .` registers an `indic-synth` console command (entry point in
+`pyproject.toml`), equivalent to `python scripts/run.py`:
+
+```bash
+indic-synth --config config.yaml                              # all stages, in order
+indic-synth --config config.yaml --stages tts_generation quality_control
+indic-synth --config config.yaml --validate-only             # check config, run nothing
+indic-synth --config config.yaml --no-validate               # skip validation (not advised)
+```
+
+Before any stage runs, the config is checked against a declarative **schema**
+(`CONFIG_SCHEMA` in `indic_synth/common/config.py`, validated by `validate_config`):
+
+- **Types / ranges / choices** — e.g. `cer_max` ∈ [0, 1], `audio_engineering.norm` ∈
+  {`peak`,`rms`,`lufs`}, `speakers_per_language` a positive int.
+- **Cross-field rules** — `ref_min_dur < ref_max_dur`, `dur_per_char_min <
+  dur_per_char_max`, `min_words ≤ max_words`.
+- **Unknown keys** are reported as warnings (likely typos) — never silently dropped.
+
+An invalid config fails fast with every problem listed and a non-zero exit code, e.g.:
+
+```
+invalid config:
+  - audio_engineering.norm: 'pek' not one of ['peak', 'rms', 'lufs']
+  - quality_control.cer_max: 5 is above maximum 1
+  - quality_control.dur_per_char_min (0.5) must be < quality_control.dur_per_char_max (0.3)
+```
+
 ## Pipeline stages & manifest chain
 
 Each stage exposes `run(cfg, logger)` and is independently resumable; `scripts/run.py`

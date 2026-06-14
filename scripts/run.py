@@ -1,11 +1,15 @@
 """run — CLI entrypoint for the synthetic speech data pipeline.
 
-Usage :
-    Run all stages in order: python scripts/run.py --config config.yaml 
-    Run selected stages: python scripts/run.py --config config.yaml --stages tts_generation quality_control
+Thin wrapper around `indic_synth.cli.main`, kept for the documented Colab flow:
 
-Loads one config.yaml, pins determinism, then runs each stage's run(cfg, logger) in
-order, threading manifests between them via the shared out_dir:
+    Run all stages in order: python scripts/run.py --config config.yaml
+    Run selected stages:     python scripts/run.py --config config.yaml --stages tts_generation quality_control
+    Validate config only:    python scripts/run.py --config config.yaml --validate-only
+
+The same orchestration is also installed as the `indic-synth` command after
+`pip install -e .` (see [project.scripts] in pyproject.toml); both call
+indic_synth.cli.main. The config is validated against the schema in
+indic_synth.common.config before any stage runs.
 
     data_acquisition    (§4.2) -> reference_manifest.jsonl
     audio_engineering   (§4.3) -> prepared_manifest.jsonl
@@ -18,67 +22,14 @@ re-running this command. Writes a top-level pipeline_summary.json.
 """
 from __future__ import annotations
 
-import argparse
-import json
 import os
 import sys
-import time
 
+# Allow running straight from a clone (python scripts/run.py ...) without pip install.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from indic_synth.audio_engineering import pipeline as audio_engineering  # noqa: E402
-from indic_synth.common.config import load_config, set_determinism  # noqa: E402
-from indic_synth.common.logging import get_logger  # noqa: E402
-from indic_synth.data_acquisition import pipeline as data_acquisition  # noqa: E402
-from indic_synth.quality_control import pipeline as quality_control  # noqa: E402
-from indic_synth.sentence_generation import pipeline as sentence_generation  # noqa: E402
-from indic_synth.tts_generation import pipeline as tts_generation  # noqa: E402
-
-STAGES = [
-    ("data_acquisition", data_acquisition.run),
-    ("audio_engineering", audio_engineering.run),
-    ("sentence_generation", sentence_generation.run),
-    ("tts_generation", tts_generation.run),
-    ("quality_control", quality_control.run),
-]
-
-
-def parse_args(argv=None):
-    p = argparse.ArgumentParser(description="Indic synthetic-speech pipeline orchestrator")
-    p.add_argument("--config", default="config.yaml", help="path to config.yaml")
-    p.add_argument("--stages", nargs="+", default=None,
-                   help="subset of stage names to run (default: all, in order)")
-    return p.parse_args(argv)
-
-
-def main(argv=None):
-    args = parse_args(argv)
-    cfg = load_config(args.config)
-    set_determinism(cfg.seed)
-    logger = get_logger("run")
-    os.makedirs(cfg.out_dir, exist_ok=True)
-    logger.info("Pipeline start | out_dir=%s seed=%d", cfg.out_dir, cfg.seed)
-
-    t0 = time.time()
-    summaries = {}
-    for name, fn in STAGES:
-        if args.stages and name not in args.stages:
-            continue # skip the stages not mentioned in the Config by user
-        logger.info("=========== stage: %s ===========", name)
-        summaries[name] = fn(cfg, logger)
-
-    pipeline_summary = {
-        "out_dir": cfg.out_dir,
-        "seed": cfg.seed,
-        "elapsed_sec": round(time.time() - t0, 2),
-        "stages": summaries,
-    }
-    with open(os.path.join(cfg.out_dir, "pipeline_summary.json"), "w", encoding="utf-8") as f:
-        json.dump(pipeline_summary, f, indent=2, ensure_ascii=False)
-    logger.info("Requested stages in pipeline done in %.1fs.",
-                pipeline_summary["elapsed_sec"])
-
+from indic_synth.cli import main  # noqa: E402
 
 if __name__ == "__main__":
     main()

@@ -16,6 +16,10 @@ requires-python = ">=3.10"
 # the package itself to load a config.
 dependencies = ["pyyaml>=6.0"]
 
+# Installable CLI: after `pip install -e .` the command `indic-synth` is on PATH.
+[project.scripts]
+indic-synth = "indic_synth.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
