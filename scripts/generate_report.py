@@ -137,9 +137,9 @@ def section_datacard(out_dir):
     L += _table(
         ["metric", "value"],
         [["utterances checked", len(rows)],
-         ["validated (qc_passed=true)", f"{len(passed)}  ({_pct(len(passed), len(rows))})"],
+         ["validated (QC passed)", f"{len(passed)}  ({_pct(len(passed), len(rows))})"],
          ["distinct languages", len(langs)],
-         ["distinct (lang, speaker)", len(speakers)],
+         ["distinct (language, speaker)", len(speakers)],
          ["validated audio", f"{total_sec:.1f} s  ({total_sec / 3600:.3f} h)"]])
     L.append("")
 
@@ -169,7 +169,7 @@ def section_datacard(out_dir):
         lang_rows.append([lang, f"{by_lang_pass[lang]}/{by_lang_total[lang]}",
                           len(spk), f"{male}/{female}"])
     L += ["### Per-language", ""]
-    L += _table(["language", "validated/total utts", "speakers", "M/F speakers"], lang_rows)
+    L += _table(["language", "valid/total utterances", "speakers", "M/F speakers"], lang_rows)
     L.append("")
 
     # per-speaker
@@ -199,7 +199,7 @@ def section_datacard(out_dir):
     L.append("")
 
     # distributions (over validated set)
-    L += ["### Distributions (min / avg / max) — over validated set", ""]
+    L += ["### Distributions — over validated set", ""]
     dist_rows = []
     d = _num([r.get("duration") for r in passed])
     if d:
@@ -219,11 +219,6 @@ def section_datacard(out_dir):
     if sim:
         dist_rows.append(["speaker_sim", f"{sim[0]:.3f}", f"{sim[1]:.3f}", f"{sim[2]:.3f}"])
     L += _table(["metric", "min", "avg", "max"], dist_rows)
-    L += ["",
-          f"_Distributions are over the {len(passed)} validated (qc_passed=true) "
-          f"utterances — the deliverable. Counts tables above show validated/total so "
-          f"failures stay visible. (Full-set duration min/avg/max: "
-          f"{dur_all[0]:.2f}/{dur_all[1]:.2f}/{dur_all[2]:.2f} s.)_", ""]
     return L
 
 
@@ -244,10 +239,7 @@ def section_quality(out_dir):
             [["checked", qc.get("checked")],
              ["passed", qc.get("passed")],
              ["failed", qc.get("failed")],
-             ["pass rate", qc.get("pass_rate")],
-             ["cer_max", th.get("cer_max")],
-             ["spk_cos_min", th.get("spk_cos_min")],
-             ["dur_per_char", th.get("dur_per_char")]])
+             ["pass rate", qc.get("pass_rate")]])
         L.append("")
     else:
         L += [f"_Unavailable — `{F_QC}` not found._", ""]
@@ -260,7 +252,7 @@ def section_quality(out_dir):
             if c.get("name") not in seen:
                 seen.append(c.get("name"))
         check_names = seen
-    L += ["### QC checks run (3 gates + hard-failure checks)", ""]
+    L += ["### QC checks run", ""]
     if check_names:
         for n in check_names:
             L.append(f"- **`{n}`** — {CHECK_DOC.get(n, 'check')}")
@@ -269,7 +261,7 @@ def section_quality(out_dir):
     L.append("")
 
     # --- QC failure breakdown (QC stage only) ---
-    L += ["### QC rejection breakdown (failed utterances only)", ""]
+    L += ["### QC rejection breakdown", ""]
     if rows:
         failed = [r for r in rows if not r.get("qc_passed")]
         reasons = Counter()
@@ -305,7 +297,7 @@ def section_quality(out_dir):
         L += [f"_Unavailable — `{F_DATASET}` not found._", ""]
 
     # --- sentence-generation text validation (separate gate) ---
-    L += ["### Sentence-generation validation (text gate — separate from audio QC)", ""]
+    L += ["### Sentence-generation validation", ""]
     sent = _load_json(os.path.join(out_dir, F_SENT))
     if sent:
         L += _table(
@@ -334,19 +326,19 @@ def section_quality(out_dir):
     if acq:
         p = acq.get("pull", {})
         ok, bad = p.get("downloaded", 0), p.get("failed", 0)
-        srows.append(["data_acquisition", "downloaded", ok, bad, _pct(ok, ok + bad)])
+        srows.append(["Data Acquisition", "downloaded", ok, bad, _pct(ok, ok + bad)])
     if aud:
         ok, bad = aud.get("prepared", 0), aud.get("failed", 0)
-        srows.append(["audio_engineering", "prepared", ok, bad, _pct(ok, ok + bad)])
+        srows.append(["Audio Engineering", "prepared", ok, bad, _pct(ok, ok + bad)])
     if sent:
         ok, seen = sent.get("total_valid", 0), sent.get("total_seen", 0)
-        srows.append(["sentence_generation", "valid", ok, seen - ok, _pct(ok, seen)])
+        srows.append(["Sentence Generation", "valid", ok, seen - ok, _pct(ok, seen)])
     if tts:
         ok, bad = tts.get("synthesized", 0), tts.get("failed", 0)
-        srows.append(["tts_generation", "synthesized", ok, bad, _pct(ok, ok + bad)])
+        srows.append(["TTS Generation", "synthesized", ok, bad, _pct(ok, ok + bad)])
     if qc:
         ok, bad = qc.get("passed", 0), qc.get("failed", 0)
-        srows.append(["quality_control", "passed", ok, bad, _pct(ok, ok + bad)])
+        srows.append(["Quality Control", "passed", ok, bad, _pct(ok, ok + bad)])
     if srows:
         L += _table(["stage", "kept as", "pass", "fail", "pass rate"], srows)
     else:
@@ -431,7 +423,7 @@ def section_throughput(out_dir):
     note = ("_All stages ran on a single Colab T4, so total compute = total wall-clock "
             "GPU-hours. `elapsed_sec` is the **actual stage wall-clock = model load + "
             "processing**; `process_sec` is the item loop alone and `model load (s)` is "
-            "the model/resource load. Throughput (incl. the TTS stage's `utterances_per_min`) "
+            "the model/resource load. Throughput "
             "is computed over the full `elapsed_sec`, so it reflects real end-to-end cost "
             "including weight loading._")
     if not have_split:
