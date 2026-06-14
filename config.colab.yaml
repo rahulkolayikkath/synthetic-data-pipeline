@@ -5,7 +5,7 @@
 
 # ---- global ----
 seed: 1234
-out_dir: /content/drive/MyDrive/indic_synth/out   # mount Drive first
+out_dir: /content/drive/MyDrive/indic_synth/out_deliverable   # mount Drive first
 
 # ---- Data Acquisition (Kathbath voice bank) ----
 # Target: 2 languages x 10 speakers = 20 distinct speakers, gender-balanced.
@@ -57,10 +57,10 @@ sentence_generation:
   sentence_types: [declarative, interrogative, imperative, exclamatory]
   per_cell_quota: 8             # 3 langs x 10 topics x 4 types x 8 ~= 960 sentences * .75(audio pass percentange) = 720
   sentences_per_call: 5
-  max_attempts_per_cell: 8
+  max_attempts_per_cell: 4
   temperature: 0.9
   top_p: 0.95
-  max_new_tokens: 256             # 12 sentance *  max length 20 = 240
+  max_new_tokens: 300             # 12 sentance *  max length 20 = 240
   min_words: 5
   max_words: 20
   script_min_ratio: 0.90
