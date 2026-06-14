@@ -22,6 +22,7 @@ from .prepare import process_clip
 def run(cfg, logger=None) -> dict:
     """Runs end-to-end. `cfg` is the unified Config."""
     logger = logger or get_logger("prepare")
+    t_start = time.time()
     acfg = AudioConfig.from_dict(cfg.stage("audio_engineering"))
 
     out_dir = os.path.abspath(acfg.out_dir)
@@ -68,7 +69,11 @@ def run(cfg, logger=None) -> dict:
         for fl in metrics["qc_flags"]:
             stats["flags"][fl] = stats["flags"].get(fl, 0) + 1
 
-    summary = {"stage": "audio_engineering", "elapsed_sec": round(time.time() - t0, 2),
+    # No model load here; process_sec ~= elapsed_sec, fields kept for cross-stage parity.
+    process_sec = round(time.time() - t0, 2)
+    summary = {"stage": "audio_engineering", "elapsed_sec": round(time.time() - t_start, 2),
+               "process_sec": process_sec,
+               "model_load_sec": round((time.time() - t_start) - process_sec, 2),
                "target_sr": acfg.target_sr, "norm": acfg.norm, "trim": acfg.trim, **stats,
                "prepared_manifest": out_manifest}
     with open(os.path.join(out_dir, "prepare_refaudio_summary.json"), "w", encoding="utf-8") as f:

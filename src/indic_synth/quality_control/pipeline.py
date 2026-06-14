@@ -85,6 +85,7 @@ def _metric(result, name):
 def run(cfg, logger=None, run_asr=True, run_speaker=True) -> dict:
     """Run §4.6 across the TTS manifest -> dataset_manifest.jsonl (final dataset)."""
     logger = logger or get_logger("qc")
+    t_start = time.time()
     qcfg = QCConfig.from_dict(cfg.stage("quality_control"))
     out_dir = os.path.abspath(qcfg.out_dir)
     tts_manifest = os.path.join(out_dir, "tts_manifest.jsonl")
@@ -94,6 +95,13 @@ def run(cfg, logger=None, run_asr=True, run_speaker=True) -> dict:
     done = load_done(out_manifest, key="utt_id")
     pending = [r for r in utts if r["utt_id"] not in done]
     logger.info("%d utterances, %d already QC'd, %d to check", len(utts), len(done), len(pending))
+
+    # Eagerly load the ASR/speaker models up front so model-load time is captured
+    # separately from per-utterance processing (lazy load would hide it in clip #1).
+    if pending and (run_asr or run_speaker):
+        from .models import warmup
+        warmup(qcfg, run_asr=run_asr, run_speaker=run_speaker)
+    model_load_sec = time.time() - t_start
 
     t0 = time.time()
     stats = {"checked": 0, "passed": 0, "failed": 0}
@@ -125,7 +133,9 @@ def run(cfg, logger=None, run_asr=True, run_speaker=True) -> dict:
 
     summary = {
         "stage": "quality_control",
-        "elapsed_sec": round(time.time() - t0, 2),
+        "elapsed_sec": round(time.time() - t_start, 2),    # actual wall-clock
+        "process_sec": round(time.time() - t0, 2),         # validation loop only
+        "model_load_sec": round(model_load_sec, 2),        # ASR + ECAPA load
         "thresholds": {"cer_max": qcfg.cer_max, "spk_cos_min": qcfg.spk_cos_min,
                        "dur_per_char": [qcfg.dur_per_char_min, qcfg.dur_per_char_max]},
         **stats,

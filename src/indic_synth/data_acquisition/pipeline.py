@@ -27,6 +27,7 @@ from .sampler import build_selection
 def run(cfg, logger=None) -> dict:
     """Run §4.2 end-to-end. `cfg` is the unified Config (has `.stage(...)`)."""
     logger = logger or get_logger("acquire")
+    t_start = time.time()
     acfg = AcquireConfig.from_dict(cfg.stage("data_acquisition"))
     logger.info("Acquisition config: %s", acfg.public_dict())
 
@@ -37,9 +38,13 @@ def run(cfg, logger=None) -> dict:
     records, sel_summary = build_selection(catalog, acfg, logger)
     pull_stats = pull_audio(records, acfg, logger)
 
+    # No model load here; process_sec ~= elapsed_sec, fields kept for cross-stage parity.
+    process_sec = round(time.time() - t0, 2)
     summary = {
         "stage": "data_acquisition",
-        "elapsed_sec": round(time.time() - t0, 2),
+        "elapsed_sec": round(time.time() - t_start, 2),
+        "process_sec": process_sec,
+        "model_load_sec": round((time.time() - t_start) - process_sec, 2),
         "selection": sel_summary,
         "pull": pull_stats,
         "reference_manifest": os.path.join(acfg.out_dir, "reference_manifest.jsonl"),

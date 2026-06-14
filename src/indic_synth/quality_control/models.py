@@ -31,6 +31,15 @@ def _load_spk(model_id: str, device: str):
     return EncoderClassifier.from_hparams(source=model_id, run_opts={"device": device})
 
 
+def warmup(cfg, run_asr: bool = True, run_speaker: bool = True) -> None:
+    """Eagerly load the cached models so their load time can be measured separately
+    from per-utterance processing (otherwise the lazy load lands on the first clip)."""
+    if run_asr:
+        _load_asr(cfg.asr_model_id, cfg.device)
+    if run_speaker:
+        _load_spk(cfg.spk_model_id, cfg.device)
+
+
 def transcribe(wav: np.ndarray, sr: int, lang_code: str, cfg) -> str:
     """Transcribe with IndicConformer. wav must already be at cfg.asr_sr (16k)."""
     import torch

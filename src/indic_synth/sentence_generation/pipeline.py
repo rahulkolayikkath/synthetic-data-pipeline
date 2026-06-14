@@ -28,8 +28,14 @@ def _cell_id(lang, topic, st):
     return f"{lang}|{topic}|{st}"
 
 
-def generate_pool(cfg: SentenceConfig, generate, deduper, langid, logger=None) -> dict:
-    """Run the grid loop with injected resources. `generate(prompt, seed)->str`."""
+def generate_pool(cfg: SentenceConfig, generate, deduper, langid, logger=None,
+                  model_load_sec: float = 0.0) -> dict:
+    """Run the grid loop with injected resources. `generate(prompt, seed)->str`.
+
+    `model_load_sec` is the time `run()` spent loading the LLM + validation resources;
+    it's folded into the reported `elapsed_sec` so the summary reflects the actual
+    stage wall-clock, while `process_sec` keeps the generation-only time.
+    """
     logger = logger or get_logger("gen")
     os.makedirs(cfg.out_dir, exist_ok=True)
 
@@ -97,11 +103,14 @@ def generate_pool(cfg: SentenceConfig, generate, deduper, langid, logger=None) -
         if cell_counts[cid] < cfg.per_cell_quota:
             logger.warning("cell under quota: %s -> %d/%d", cid, cell_counts[cid], cfg.per_cell_quota)
 
+    process_sec = round(time.time() - t0, 2)
     total_rej = sum(rejection_stats.values())
     total_seen = total_rej + len(pool)
     summary = {
         "stage": "sentence_generation",
-        "elapsed_sec": round(time.time() - t0, 2),
+        "elapsed_sec": round(model_load_sec + process_sec, 2),  # actual wall-clock
+        "process_sec": process_sec,                             # generation only
+        "model_load_sec": round(model_load_sec, 2),             # Gemma + LaBSE + fastText
         "total_valid": len(pool),
         "total_seen": total_seen,
         "yield": round(len(pool) / max(total_seen, 1), 4),
@@ -131,9 +140,12 @@ def run(cfg, logger=None) -> dict:
     except ImportError:
         device = "cpu"
 
+    t_load = time.time()
     generate = load_generator(scfg, logger)
     embed_model = SentenceTransformer(scfg.embed_model_id, device=device)
     deduper = Deduper(embed_model, scfg.near_dup_threshold)
     langid = LanguageIdentifier(scfg.langid_backend, model_dir=scfg.out_dir)
+    model_load_sec = time.time() - t_load
 
-    return generate_pool(scfg, generate, deduper, langid, logger)
+    return generate_pool(scfg, generate, deduper, langid, logger,
+                         model_load_sec=model_load_sec)

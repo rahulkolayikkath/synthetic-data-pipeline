@@ -382,14 +382,23 @@ def section_throughput(out_dir):
         ("tts_generation", F_TTS),
         ("quality_control", F_QC),
     ]
-    rows, total_sec = [], 0.0
+    rows, total_sec, total_load_sec = [], 0.0, 0.0
+    have_split = False
     for name, fname in stage_files:
         s = _load_json(os.path.join(out_dir, fname))
         if not s:
-            rows.append([name, "—", "—", "—", "_missing_", "—"])
+            rows.append([name, "—", "—", "—", "—", "_missing_", "—"])
             continue
-        sec = float(s.get("elapsed_sec") or 0)
+        sec = float(s.get("elapsed_sec") or 0)          # actual wall-clock
         total_sec += sec
+        proc = s.get("process_sec")
+        load = s.get("model_load_sec")
+        if proc is not None or load is not None:
+            have_split = True
+        if load is not None:
+            total_load_sec += float(load)
+        proc_str = f"{float(proc):.1f}" if proc is not None else "—"
+        load_str = f"{float(load):.1f}" if load is not None else "—"
         label, n = _stage_items(name, s)
         # prefer the stage's own utterances_per_min if it reports one
         if s.get("utterances_per_min") is not None:
@@ -398,9 +407,10 @@ def section_throughput(out_dir):
             rate = f"{n / (sec / 60):.1f} {label}/min"
         else:
             rate = "n/a"
-        rows.append([name, f"{sec:.1f}", f"{sec / 60:.2f}",
+        rows.append([name, f"{sec:.1f}", proc_str, load_str,
                      f"{sec / 3600:.4f}", f"{n} {label}", rate])
-    L += _table(["stage", "elapsed (s)", "min", "T4 GPU-hr", "items", "throughput"], rows)
+    L += _table(["stage", "elapsed (s)", "process (s)", "model load (s)",
+                 "T4 GPU-hr", "items", "throughput"], rows)
     L.append("")
 
     # totals
@@ -411,15 +421,24 @@ def section_throughput(out_dir):
         ["total wall-clock", f"{total_sec:.1f} s  ({total_sec / 60:.1f} min)"],
         ["total compute (T4 GPU-hours)", f"{total_sec / 3600:.4f}"],
     ]
+    if have_split:
+        tot_rows.append(["of which model loading",
+                         f"{total_load_sec:.1f} s  ({_pct(total_load_sec, total_sec)})"])
     if n_pass and total_sec > 0:
         tot_rows.append(["end-to-end yield (validated utts / total time)",
                          f"{n_pass / (total_sec / 60):.2f} utts/min"])
     L += _table(["metric", "value"], tot_rows)
-    L += ["",
-          "_All stages ran on a single Colab T4, so total compute = total wall-clock "
-          "GPU-hours. Each stage's `elapsed_sec` is wall-clock and **includes model-weight "
-          "loading**, so the throughput figures are end-to-end (matching how the TTS stage "
-          "reports its own utterances/min)._", ""]
+    note = ("_All stages ran on a single Colab T4, so total compute = total wall-clock "
+            "GPU-hours. `elapsed_sec` is the **actual stage wall-clock = model load + "
+            "processing**; `process_sec` is the item loop alone and `model load (s)` is "
+            "the model/resource load. Throughput (incl. the TTS stage's `utterances_per_min`) "
+            "is computed over the full `elapsed_sec`, so it reflects real end-to-end cost "
+            "including weight loading._")
+    if not have_split:
+        note += ("\n\n_Note: these summaries predate the load/process split, so "
+                 "`process (s)` / `model load (s)` show `—` and `elapsed_sec` here is "
+                 "processing-only. Re-run the stages to capture model-load time._")
+    L += ["", note, ""]
     return L
 
 

@@ -56,8 +56,13 @@ def _refs_by_lang(prepared, lang_map):
     return by_code
 
 
-def synthesize_pool(cfg: TTSConfig, synth, logger=None) -> dict:
-    """Pair + synthesize with an injected `synth(text, ref_audio_path, ref_text)`."""
+def synthesize_pool(cfg: TTSConfig, synth, logger=None, model_load_sec: float = 0.0) -> dict:
+    """Pair + synthesize with an injected `synth(text, ref_audio_path, ref_text)`.
+
+    `model_load_sec` is the time `run()` spent loading IndicF5; it's folded into the
+    reported `elapsed_sec` (actual stage wall-clock) and into `utterances_per_min`,
+    while `process_sec` keeps the synthesis-only time.
+    """
     logger = logger or get_logger("tts")
     out_dir = os.path.abspath(cfg.out_dir)
     audio_dir = os.path.join(out_dir, "tts_audio")
@@ -129,10 +134,14 @@ def synthesize_pool(cfg: TTSConfig, synth, logger=None) -> dict:
             logger.info("[%d/%d] Generation speed: %.1f utt/min, %d pass / %d fail",
                         i, n_pending, rate * 60, stats["synthesized"], stats["failed"])
 
-    elapsed = time.time() - t0
+    process_sec = time.time() - t0
+    elapsed = model_load_sec + process_sec                      # actual wall-clock
     summary = {
         "stage": "tts_generation",
         "elapsed_sec": round(elapsed, 2),
+        "process_sec": round(process_sec, 2),                  # synthesis only
+        "model_load_sec": round(model_load_sec, 2),            # IndicF5 load
+        # throughput over the full wall-clock (includes model loading)
         "utterances_per_min": round(stats["synthesized"] / max(elapsed / 60, 1e-9), 1),
         **stats,
         "tts_manifest": out_manifest,
@@ -149,5 +158,7 @@ def run(cfg, logger=None) -> dict:
     tcfg = TTSConfig.from_dict(cfg.stage("tts_generation"))
 
     from .models import IndicF5
+    t_load = time.time()
     model = IndicF5(tcfg, logger)
-    return synthesize_pool(tcfg, model.synthesize, logger)
+    model_load_sec = time.time() - t_load
+    return synthesize_pool(tcfg, model.synthesize, logger, model_load_sec=model_load_sec)
