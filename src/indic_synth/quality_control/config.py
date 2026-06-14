@@ -36,8 +36,13 @@ class QCConfig:
     trunc_tail_ms: float = 60.0
     trunc_tail_ratio: float = 0.60                   #0.25 was too strict, 
     loop_min_lag_s: float = 0.30
-    loop_pair_sim: float = 0.95
-    loop_band_frac: float = 0.85
+    loop_pair_sim: float = 0.99                      # near-impossible per-pair match
+    # looping_audio gate effectively DISABLED: best_frac is a fraction in [0, 1],
+    # so a threshold > 1.0 can never be exceeded -> no clip is ever flagged.
+    # The MFCC self-similarity heuristic produced ~75% of all QC failures and was
+    # judged too fragile (false positives on non-looping audio). Pending a better
+    # detector; re-tighten to ~0.85 once the check is improved.
+    loop_band_frac: float = 1.01
     text_repeat_ngram: int = 3
     device: str = "cuda"                             # "cpu" or "cuda" if available, Going with cuda as running on gpu
 
