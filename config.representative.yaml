@@ -7,7 +7,7 @@
 
 # ---- global ----
 seed: 1234
-out_dir: /content/drive/MyDrive/indic_synth/out_deliverable  # separate from the real run's .../out
+out_dir: /content/drive/MyDrive/indic_synth/out  # separate from the real run's .../out
 
 # ---- Data Acquisition (Kathbath voice bank) ----
 # 3 langs x 2 speakers = 6 distinct speakers, gender-balanced (1M + 1F per language).
