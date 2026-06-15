@@ -64,6 +64,13 @@ invalid config:
 ```
 
 ## Pipeline stages & manifest chain
+The system is a five-stage pipeline over a shared common/ layer (logging, config, manifest IO, checkpointing). Each stage is a Python package exposing a single run(cfg, logger) entry point, so any stage runs on its own and is independently resumable.
+1) Data Acquisition — treats Kathbath as a voice bank, not training data. Builds a cheap metadata catalog of speakers, then selectively downloads a small, gender-balanced set of reference clips.
+2) Audio Engineering — turns each raw reference clip into exactly what IndicF5 expects: 24 kHz mono peak-normalized WAV. Resampling and loudness are made explicit and verified so no silent format bug leaks downstream.
+3) Sentence Generation — Gemma-3-12B (4-bit) walks a (language × topic × sentence_type) grid so coverage is balanced by construction, and runs every candidate through a programmatic validation gate (script, language-ID, normalization, degeneracy, dedup).
+4) TTS Generation — IndicF5 is conditioned on a real reference clip + transcript and made to speak a generated sentence in that speaker's own language. Long text is chunked at sentence boundaries and re-joined.
+5) Quality Control — Every clip passes three independent gates — content fidelity (ASR + CER), speaker fidelity (embedding cosine), and hard-failure DSP checks — before it enters the final dataset.
+
 
 Each stage exposes `run(cfg, logger)` and is independently resumable; `scripts/run.py`
 runs them in order, threading manifests through a shared `out_dir`:
